@@ -1,0 +1,29 @@
+﻿using AC.Domain.Modules.Roles;
+using AC.Domain.Modules.Users;
+using Microsoft.EntityFrameworkCore;
+
+namespace AC.Infrastructure.Persistence.EntityFramework;
+
+public class CoreDbContext(DbContextOptions<CoreDbContext> options) : DbContext(options)
+{
+    public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(CoreDbContext).Assembly,
+            t => t.Namespace != null &&
+                 t.Namespace.StartsWith("AC.Infrastructure.Persistence.EntityFramework.Configurations"));
+
+        // Igual que en EDI: nada de borrado en cascada por defecto
+        foreach (var foreignKey in modelBuilder.Model
+                     .GetEntityTypes()
+                     .SelectMany(e => e.GetForeignKeys()))
+        {
+            foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+        }
+
+        base.OnModelCreating(modelBuilder);
+    }
+}

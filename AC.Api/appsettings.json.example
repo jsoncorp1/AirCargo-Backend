@@ -1,0 +1,18 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "AirCargoDb": "Host=YOUR_HOST;Database=YOUR_DB;Username=YOUR_USER;Password=YOUR_PASSWORD;SSL Mode=VerifyFull;Channel Binding=Require"
+  },
+  "Jwt": {
+    "Issuer": "AirCargo",
+    "Audience": "AirCargo.Client",
+    "SecretKey": "REPLACE-WITH-A-LONG-RANDOM-SECRET-AT-LEAST-32-CHARACTERS",
+    "ExpiryMinutes": 120
+  },
+  "AllowedHosts": "*"
+}
