@@ -24,11 +24,11 @@ public class PutOrderDeliveryEndPoint(IMediator mediator)
         var command = new UpdateOrderDeliveryCommand
         {
             Id = request.Id,
-            Departamento = request.Body.Departamento,
-            ClientePhone = request.Body.ClientePhone,
-            ClienteNombreCompleto = request.Body.ClienteNombreCompleto,
-            ClienteDireccion = request.Body.ClienteDireccion,
-            TipoEntrega = request.Body.TipoEntrega,
+            Department = request.Body.Department,
+            ClientPhone = request.Body.ClientPhone,
+            ClientFullName = request.Body.ClientFullName,
+            ClientAddress = request.Body.ClientAddress,
+            DeliveryType = request.Body.DeliveryType,
             Lines = request.Body.Lines.Select(l => new UpdateOrderDeliveryLine
             {
                 ArticleId = l.ArticleId,
@@ -61,11 +61,11 @@ public class PutOrderDeliveryRequest
 
 public class PutOrderDeliveryBody
 {
-    public DepartamentoBolivia Departamento { get; set; }
-    public string ClientePhone { get; set; } = null!;
-    public string ClienteNombreCompleto { get; set; } = null!;
-    public string ClienteDireccion { get; set; } = null!;
-    public TipoEntrega TipoEntrega { get; set; }
+    public BolivianDepartment Department { get; set; }
+    public string ClientPhone { get; set; } = null!;
+    public string ClientFullName { get; set; } = null!;
+    public string ClientAddress { get; set; } = null!;
+    public DeliveryType DeliveryType { get; set; }
     public List<PutOrderDeliveryLineBody> Lines { get; set; } = [];
 }
 

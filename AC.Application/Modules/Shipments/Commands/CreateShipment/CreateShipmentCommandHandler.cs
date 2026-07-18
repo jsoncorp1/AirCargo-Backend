@@ -51,13 +51,13 @@ public class CreateShipmentCommandHandler(
                     "El costo de envío de cada línea no puede ser negativo.", "shipment.shippingcost.invalid");
         }
 
-        int correlativo = (await shipmentRepository.MaxAsync(s => s.Correlativo, cancellationToken) ?? 0) + 1;
+        int sequenceNumber = (await shipmentRepository.MaxAsync(s => s.SequenceNumber, cancellationToken) ?? 0) + 1;
 
         var shipment = new Shipment
         {
             Id = Guid.NewGuid(),
             OrderDeliveryId = order.Id,
-            Correlativo = correlativo,
+            SequenceNumber = sequenceNumber,
             TotalWeight = command.Lines.Sum(l => l.Weight),
             ShippingPrice = command.Lines.Sum(l => l.ShippingCost)
         };
@@ -79,7 +79,7 @@ public class CreateShipmentCommandHandler(
         {
             Id = shipment.Id,
             OrderDeliveryId = shipment.OrderDeliveryId,
-            NumeroGuia = shipment.Correlativo.ToString("D8"),
+            WaybillNumber = shipment.SequenceNumber.ToString("D8"),
             TotalWeight = shipment.TotalWeight,
             ShippingPrice = shipment.ShippingPrice,
             Details = details.Select(d => new CreateShipmentDetailResult

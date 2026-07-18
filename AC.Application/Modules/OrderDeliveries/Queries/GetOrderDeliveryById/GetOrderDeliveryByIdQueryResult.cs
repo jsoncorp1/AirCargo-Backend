@@ -9,11 +9,11 @@ public class GetOrderDeliveryByIdQueryResult : IQueryResult
     public string SupplierName { get; set; } = string.Empty;
     public Guid UserId { get; set; }
     public string UserName { get; set; } = string.Empty;
-    public string Departamento { get; set; } = string.Empty;
-    public string ClientePhone { get; set; } = string.Empty;
-    public string ClienteNombreCompleto { get; set; } = string.Empty;
-    public string ClienteDireccion { get; set; } = string.Empty;
-    public string TipoEntrega { get; set; } = string.Empty;
+    public string Department { get; set; } = string.Empty;
+    public string ClientPhone { get; set; } = string.Empty;
+    public string ClientFullName { get; set; } = string.Empty;
+    public string ClientAddress { get; set; } = string.Empty;
+    public string DeliveryType { get; set; } = string.Empty;
     public decimal TotalPrice { get; set; }
     public bool IsAttended { get; set; }
     public DateTime CreatedAt { get; set; }

@@ -105,11 +105,11 @@ public class UpdateOrderDeliveryCommandHandler(
             });
         }
 
-        order.Departamento = command.Departamento;
-        order.ClientePhone = command.ClientePhone;
-        order.ClienteNombreCompleto = command.ClienteNombreCompleto;
-        order.ClienteDireccion = command.ClienteDireccion;
-        order.TipoEntrega = command.TipoEntrega;
+        order.Department = command.Department;
+        order.ClientPhone = command.ClientPhone;
+        order.ClientFullName = command.ClientFullName;
+        order.ClientAddress = command.ClientAddress;
+        order.DeliveryType = command.DeliveryType;
         order.TotalPrice = totalPrice;
 
         await orderDeliveryRepository.UpdateAsync(order, cancellationToken);
@@ -126,11 +126,11 @@ public class UpdateOrderDeliveryCommandHandler(
             Id = order.Id,
             SupplierId = order.SupplierId,
             UserId = order.UserId,
-            Departamento = order.Departamento,
-            ClientePhone = order.ClientePhone,
-            ClienteNombreCompleto = order.ClienteNombreCompleto,
-            ClienteDireccion = order.ClienteDireccion,
-            TipoEntrega = order.TipoEntrega,
+            Department = order.Department,
+            ClientPhone = order.ClientPhone,
+            ClientFullName = order.ClientFullName,
+            ClientAddress = order.ClientAddress,
+            DeliveryType = order.DeliveryType,
             TotalPrice = order.TotalPrice,
             Details = newDetails.Select(d => new UpdateOrderDeliveryDetailResult
             {

@@ -28,8 +28,8 @@ public class GetShipmentsPaginatedQueryHandler(IRepository<Shipment> repository)
             {
                 Id = s.Id,
                 OrderDeliveryId = s.OrderDeliveryId,
-                NumeroGuia = s.Correlativo.ToString("D8"),
-                ClienteNombreCompleto = s.OrderDelivery.ClienteNombreCompleto,
+                WaybillNumber = s.SequenceNumber.ToString("D8"),
+                ClientFullName = s.OrderDelivery.ClientFullName,
                 TotalWeight = s.TotalWeight,
                 ShippingPrice = s.ShippingPrice,
                 CreatedAt = s.CreatedAt

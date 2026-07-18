@@ -1,6 +1,6 @@
 namespace AC.Domain.Modules.OrderDeliveries;
 
-public enum DepartamentoBolivia
+public enum BolivianDepartment
 {
     Beni,
     Chuquisaca,

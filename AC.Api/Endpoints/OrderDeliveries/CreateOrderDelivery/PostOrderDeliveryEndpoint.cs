@@ -23,11 +23,11 @@ public class PostOrderDeliveryEndPoint(IMediator mediator)
         var command = new CreateOrderDeliveryCommand
         {
             UserId = request.UserId,
-            Departamento = request.Departamento,
-            ClientePhone = request.ClientePhone,
-            ClienteNombreCompleto = request.ClienteNombreCompleto,
-            ClienteDireccion = request.ClienteDireccion,
-            TipoEntrega = request.TipoEntrega,
+            Department = request.Department,
+            ClientPhone = request.ClientPhone,
+            ClientFullName = request.ClientFullName,
+            ClientAddress = request.ClientAddress,
+            DeliveryType = request.DeliveryType,
             Lines = request.Lines.Select(l => new CreateOrderDeliveryLine
             {
                 ArticleId = l.ArticleId,
@@ -48,11 +48,11 @@ public class PostOrderDeliveryEndPoint(IMediator mediator)
 public class CreateOrderDeliveryRequest
 {
     public Guid UserId { get; set; }
-    public DepartamentoBolivia Departamento { get; set; }
-    public string ClientePhone { get; set; } = null!;
-    public string ClienteNombreCompleto { get; set; } = null!;
-    public string ClienteDireccion { get; set; } = null!;
-    public TipoEntrega TipoEntrega { get; set; }
+    public BolivianDepartment Department { get; set; }
+    public string ClientPhone { get; set; } = null!;
+    public string ClientFullName { get; set; } = null!;
+    public string ClientAddress { get; set; } = null!;
+    public DeliveryType DeliveryType { get; set; }
     public List<CreateOrderDeliveryLineRequest> Lines { get; set; } = [];
 }
 

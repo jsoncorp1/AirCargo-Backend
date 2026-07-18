@@ -6,11 +6,11 @@ namespace AC.Application.Modules.OrderDeliveries.Commands.CreateOrderDelivery;
 public class CreateOrderDeliveryCommand : ICommand<CreateOrderDeliveryCommandResult>
 {
     public Guid UserId { get; set; }
-    public DepartamentoBolivia Departamento { get; set; }
-    public string ClientePhone { get; set; } = string.Empty;
-    public string ClienteNombreCompleto { get; set; } = string.Empty;
-    public string ClienteDireccion { get; set; } = string.Empty;
-    public TipoEntrega TipoEntrega { get; set; }
+    public BolivianDepartment Department { get; set; }
+    public string ClientPhone { get; set; } = string.Empty;
+    public string ClientFullName { get; set; } = string.Empty;
+    public string ClientAddress { get; set; } = string.Empty;
+    public DeliveryType DeliveryType { get; set; }
     public List<CreateOrderDeliveryLine> Lines { get; set; } = [];
 }
 

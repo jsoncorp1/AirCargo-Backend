@@ -29,9 +29,9 @@ public class GetOrderDeliveriesPaginatedQueryHandler(IRepository<OrderDelivery> 
                 Id = o.Id,
                 SupplierId = o.SupplierId,
                 SupplierName = o.Supplier.Name,
-                ClienteNombreCompleto = o.ClienteNombreCompleto,
-                Departamento = o.Departamento.ToString(),
-                TipoEntrega = o.TipoEntrega.ToString(),
+                ClientFullName = o.ClientFullName,
+                Department = o.Department.ToString(),
+                DeliveryType = o.DeliveryType.ToString(),
                 TotalPrice = o.TotalPrice,
                 IsAttended = o.Shipments.Any(s => s.Active),
                 CreatedAt = o.CreatedAt

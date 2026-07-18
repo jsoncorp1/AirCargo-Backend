@@ -18,7 +18,7 @@ internal class EfShipmentConfig : IEntityTypeConfiguration<Shipment>
         // Correlativo único solo entre envíos activos: MaxAsync (usado para generarlo)
         // también solo mira filas activas, así que un envío cancelado no debe seguir
         // "ocupando" su número frente a uno nuevo.
-        builder.HasIndex(s => s.Correlativo)
+        builder.HasIndex(s => s.SequenceNumber)
             .IsUnique()
             .HasFilter("active = true");
 

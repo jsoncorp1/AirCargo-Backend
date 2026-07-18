@@ -87,11 +87,11 @@ public class CreateOrderDeliveryCommandHandler(
             Id = Guid.NewGuid(),
             SupplierId = supplierId,
             UserId = command.UserId,
-            Departamento = command.Departamento,
-            ClientePhone = command.ClientePhone,
-            ClienteNombreCompleto = command.ClienteNombreCompleto,
-            ClienteDireccion = command.ClienteDireccion,
-            TipoEntrega = command.TipoEntrega,
+            Department = command.Department,
+            ClientPhone = command.ClientPhone,
+            ClientFullName = command.ClientFullName,
+            ClientAddress = command.ClientAddress,
+            DeliveryType = command.DeliveryType,
             TotalPrice = totalPrice
         };
 
@@ -108,11 +108,11 @@ public class CreateOrderDeliveryCommandHandler(
             Id = orderDelivery.Id,
             SupplierId = orderDelivery.SupplierId,
             UserId = orderDelivery.UserId,
-            Departamento = orderDelivery.Departamento,
-            ClientePhone = orderDelivery.ClientePhone,
-            ClienteNombreCompleto = orderDelivery.ClienteNombreCompleto,
-            ClienteDireccion = orderDelivery.ClienteDireccion,
-            TipoEntrega = orderDelivery.TipoEntrega,
+            Department = orderDelivery.Department,
+            ClientPhone = orderDelivery.ClientPhone,
+            ClientFullName = orderDelivery.ClientFullName,
+            ClientAddress = orderDelivery.ClientAddress,
+            DeliveryType = orderDelivery.DeliveryType,
             TotalPrice = orderDelivery.TotalPrice,
             Details = details.Select(d => new CreateOrderDeliveryDetailResult
             {

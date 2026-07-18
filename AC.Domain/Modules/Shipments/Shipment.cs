@@ -8,7 +8,7 @@ public class Shipment : CoreEntity
     public Guid OrderDeliveryId { get; set; }
     public OrderDelivery OrderDelivery { get; set; } = null!;
 
-    public int Correlativo { get; set; }
+    public int SequenceNumber { get; set; }
     public decimal TotalWeight { get; set; }
     public decimal ShippingPrice { get; set; }
 

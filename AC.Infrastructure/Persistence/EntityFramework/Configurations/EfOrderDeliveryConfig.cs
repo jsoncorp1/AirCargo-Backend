@@ -8,25 +8,25 @@ internal class EfOrderDeliveryConfig : IEntityTypeConfiguration<OrderDelivery>
 {
     public void Configure(EntityTypeBuilder<OrderDelivery> builder)
     {
-        builder.Property(o => o.Departamento)
+        builder.Property(o => o.Department)
             .HasConversion<string>()
             .HasMaxLength(20)
             .IsRequired();
 
-        builder.Property(o => o.TipoEntrega)
+        builder.Property(o => o.DeliveryType)
             .HasConversion<string>()
             .HasMaxLength(20)
             .IsRequired();
 
-        builder.Property(o => o.ClientePhone)
+        builder.Property(o => o.ClientPhone)
             .IsRequired()
             .HasMaxLength(30);
 
-        builder.Property(o => o.ClienteNombreCompleto)
+        builder.Property(o => o.ClientFullName)
             .IsRequired()
             .HasMaxLength(150);
 
-        builder.Property(o => o.ClienteDireccion)
+        builder.Property(o => o.ClientAddress)
             .IsRequired()
             .HasMaxLength(300);
 
