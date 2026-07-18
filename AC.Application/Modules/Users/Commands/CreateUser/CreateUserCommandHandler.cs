@@ -30,7 +30,7 @@ public class CreateUserCommandHandler(
         {
             Id = Guid.NewGuid(),
             FullName = command.FullName,
-            Email = command.Email,
+            Email = command.Email.Trim().ToLowerInvariant(),
             PasswordHash = passwordHasher.Hash(command.Password),
             PhoneNumber = command.PhoneNumber,
             Dni = command.Dni,

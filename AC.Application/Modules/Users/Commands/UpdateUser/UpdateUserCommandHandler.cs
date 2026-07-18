@@ -50,7 +50,7 @@ public class UpdateUserCommandHandler(
         }
 
         user.FullName = command.FullName;
-        user.Email = command.Email;
+        user.Email = command.Email.Trim().ToLowerInvariant();
         user.PhoneNumber = command.PhoneNumber;
         user.Dni = command.Dni;
         user.RoleId = command.RoleId;

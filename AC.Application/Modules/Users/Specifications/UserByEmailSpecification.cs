@@ -7,8 +7,10 @@ public sealed class UserByEmailSpecification : Specification<User>
 {
     public UserByEmailSpecification(string email)
     {
+        string normalizedEmail = email.Trim().ToLowerInvariant();
+
         Query
-            .Where(u => u.Email == email)
+            .Where(u => u.Email.ToLower() == normalizedEmail)
             .Include(u => u.Role)
             .Include(u => u.Supplier);
     }
