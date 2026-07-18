@@ -5,7 +5,7 @@ using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace AC.Api.Endpoints.Users.GetUserById;
+namespace AC.Api.Endpoints.Users.GetUser;
 
 public class GetUserEndPoint(IMediator mediator)
     : EndpointBaseAsync
