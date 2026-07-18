@@ -30,7 +30,10 @@ public class LoginCommandHandler(
             Id = user.Id,
             FullName = user.FullName,
             Email = user.Email,
+            RoleId = user.RoleId,
             Role = user.Role.Name,
+            SupplierId = user.SupplierId,
+            SupplierName = user.Supplier?.Name,
             Token = token
         });
     }
