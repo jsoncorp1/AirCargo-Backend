@@ -1,6 +1,8 @@
 ﻿using AC.Domain.Modules.Articles;
 using AC.Domain.Modules.ArticleReceipts;
+using AC.Domain.Modules.OrderDeliveries;
 using AC.Domain.Modules.Roles;
+using AC.Domain.Modules.Shipments;
 using AC.Domain.Modules.Suppliers;
 using AC.Domain.Modules.Users;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +16,10 @@ public class CoreDbContext(DbContextOptions<CoreDbContext> options) : DbContext(
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<Article> Articles { get; set; }
     public DbSet<ArticleReceipt> ArticleReceipts { get; set; }
+    public DbSet<OrderDelivery> OrderDeliveries { get; set; }
+    public DbSet<OrderDeliveryDetail> OrderDeliveryDetails { get; set; }
+    public DbSet<Shipment> Shipments { get; set; }
+    public DbSet<ShipmentDetail> ShipmentDetails { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

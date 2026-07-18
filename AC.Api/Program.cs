@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using AC.Application;
 using AC.Application.Services.Security;
 using AC.Infrastructure.Persistence.EntityFramework;
@@ -10,7 +11,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
