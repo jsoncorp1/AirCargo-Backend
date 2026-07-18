@@ -25,7 +25,6 @@ public class PutArticleEndPoint(IMediator mediator)
             Id = request.Id,
             Sku = request.Body.Sku,
             Name = request.Body.Name,
-            Count = request.Body.Count,
             Price = request.Body.Price,
             SupplierId = request.Body.SupplierId
         };
@@ -56,7 +55,6 @@ public class PutArticleBody
 {
     public string Sku { get; set; } = null!;
     public string Name { get; set; } = null!;
-    public int Count { get; set; }
     public decimal Price { get; set; }
     public Guid SupplierId { get; set; }
 }

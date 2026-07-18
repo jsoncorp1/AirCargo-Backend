@@ -1,4 +1,5 @@
 ﻿using AC.Domain.Common;
+using AC.Domain.Modules.ArticleReceipts;
 using AC.Domain.Modules.Suppliers;
 
 namespace AC.Domain.Modules.Articles;
@@ -12,4 +13,6 @@ public class Article : CoreEntity
     
     public Guid SupplierId { get; set; }
     public Supplier Supplier { get; set; } = null!;
+    public ICollection<ArticleReceipt> ArticleReceipts { get; set; } = new List<ArticleReceipt>();
+    
 }

@@ -39,7 +39,6 @@ public class UpdateArticleCommandHandler(
 
         article.Sku = command.Sku;
         article.Name = command.Name;
-        article.Count = command.Count;
         article.Price = command.Price;
         article.SupplierId = command.SupplierId;
 

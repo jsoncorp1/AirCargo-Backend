@@ -23,7 +23,6 @@ public class PostArticleEndPoint(IMediator mediator)
         {
             Sku = request.Sku,
             Name = request.Name,
-            Count = request.Count,
             Price = request.Price,
             SupplierId = request.SupplierId
         };
@@ -41,7 +40,6 @@ public class CreateArticleRequest
 {
     public string Sku { get; set; } = null!;
     public string Name { get; set; } = null!;
-    public int Count { get; set; }
     public decimal Price { get; set; }
     public Guid SupplierId { get; set; }
 }

@@ -7,7 +7,6 @@ public class UpdateArticleCommand : ICommand<UpdateArticleCommandResult>
     public Guid Id { get; set; }
     public string Sku { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
-    public int Count { get; set; }
     public decimal Price { get; set; }
     public Guid SupplierId { get; set; }
 }

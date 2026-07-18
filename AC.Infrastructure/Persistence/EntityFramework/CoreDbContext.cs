@@ -1,4 +1,5 @@
 ﻿using AC.Domain.Modules.Articles;
+using AC.Domain.Modules.ArticleReceipts;
 using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Suppliers;
 using AC.Domain.Modules.Users;
@@ -12,6 +13,7 @@ public class CoreDbContext(DbContextOptions<CoreDbContext> options) : DbContext(
     public DbSet<Role> Roles { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<Article> Articles { get; set; }
+    public DbSet<ArticleReceipt> ArticleReceipts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -26,7 +26,7 @@ public class CreateArticleCommandHandler(
             Id = Guid.NewGuid(),
             Sku = command.Sku,
             Name = command.Name,
-            Count = command.Count,
+            Count = 0,
             Price = command.Price,
             SupplierId = command.SupplierId
         };
