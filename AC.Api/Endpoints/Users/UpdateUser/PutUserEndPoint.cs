@@ -27,7 +27,8 @@ public class PutUserEndPoint(IMediator mediator)
             Email = request.Body.Email,
             PhoneNumber = request.Body.PhoneNumber ?? string.Empty,
             Dni = request.Body.Dni ?? string.Empty,
-            RoleId = request.Body.RoleId
+            RoleId = request.Body.RoleId,
+            SupplierId = request.Body.SupplierId
         };
 
         var result = await mediator.SendCommandAsync<UpdateUserCommand, UpdateUserCommandResult>(
@@ -59,4 +60,5 @@ public class PutUserBody
     public string? PhoneNumber { get; set; }
     public string? Dni { get; set; }
     public Guid RoleId { get; set; }
+    public Guid? SupplierId { get; set; }
 }

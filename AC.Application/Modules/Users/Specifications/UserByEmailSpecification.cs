@@ -9,6 +9,7 @@ public sealed class UserByEmailSpecification : Specification<User>
     {
         Query
             .Where(u => u.Email == email)
-            .Include(u => u.Role);
+            .Include(u => u.Role)
+            .Include(u => u.Supplier);
     }
 }

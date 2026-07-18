@@ -22,6 +22,76 @@ namespace AC.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("AC.Domain.Modules.Articles.Article", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("integer")
+                        .HasColumnName("count");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("price");
+
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("sku");
+
+                    b.Property<Guid>("SupplierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("supplier_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_articles");
+
+                    b.HasIndex("SupplierId")
+                        .HasDatabaseName("ix_articles_supplier_id");
+
+                    b.ToTable("articles", (string)null);
+                });
+
             modelBuilder.Entity("AC.Domain.Modules.Roles.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -73,6 +143,59 @@ namespace AC.Infrastructure.Migrations
                         .HasName("pk_roles");
 
                     b.ToTable("roles", (string)null);
+                });
+
+            modelBuilder.Entity("AC.Domain.Modules.Suppliers.Supplier", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_suppliers");
+
+                    b.ToTable("suppliers", (string)null);
                 });
 
             modelBuilder.Entity("AC.Domain.Modules.Users.User", b =>
@@ -133,6 +256,10 @@ namespace AC.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("role_id");
 
+                    b.Property<Guid?>("SupplierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("supplier_id");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
@@ -147,7 +274,22 @@ namespace AC.Infrastructure.Migrations
                     b.HasIndex("RoleId")
                         .HasDatabaseName("ix_users_role_id");
 
+                    b.HasIndex("SupplierId")
+                        .HasDatabaseName("ix_users_supplier_id");
+
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("AC.Domain.Modules.Articles.Article", b =>
+                {
+                    b.HasOne("AC.Domain.Modules.Suppliers.Supplier", "Supplier")
+                        .WithMany("Articles")
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_articles_suppliers_supplier_id");
+
+                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("AC.Domain.Modules.Users.User", b =>
@@ -159,11 +301,26 @@ namespace AC.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_users_roles_role_id");
 
+                    b.HasOne("AC.Domain.Modules.Suppliers.Supplier", "Supplier")
+                        .WithMany("Users")
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_users_suppliers_supplier_id");
+
                     b.Navigation("Role");
+
+                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("AC.Domain.Modules.Roles.Role", b =>
                 {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("AC.Domain.Modules.Suppliers.Supplier", b =>
+                {
+                    b.Navigation("Articles");
+
                     b.Navigation("Users");
                 });
 #pragma warning restore 612, 618

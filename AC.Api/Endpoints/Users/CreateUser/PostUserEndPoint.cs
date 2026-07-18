@@ -26,7 +26,8 @@ public class PostUserEndPoint(IMediator mediator)
             Password = request.Password,
             PhoneNumber = request.PhoneNumber ?? string.Empty,
             Dni = request.Dni ?? string.Empty,
-            RoleId = request.RoleId
+            RoleId = request.RoleId,
+            SupplierId = request.SupplierId
         };
 
         var result = await mediator.SendCommandAsync<CreateUserCommand, CreateUserCommandResult>(

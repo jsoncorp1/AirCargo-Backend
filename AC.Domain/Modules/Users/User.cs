@@ -1,5 +1,6 @@
 ﻿using AC.Domain.Common;
 using AC.Domain.Modules.Roles;
+using AC.Domain.Modules.Suppliers;
 
 namespace AC.Domain.Modules.Users;
 
@@ -13,4 +14,7 @@ public class User : CoreEntity
 
     public Guid RoleId { get; set; }         
     public Role Role { get; set; } = null!;  
+    
+    public Guid? SupplierId { get; set; }
+    public Supplier? Supplier { get; set; }
 }

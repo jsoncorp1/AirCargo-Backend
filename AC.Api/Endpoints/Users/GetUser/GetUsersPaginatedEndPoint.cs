@@ -20,7 +20,13 @@ public class GetUsersPaginatedEndPoint(IMediator mediator)
         CancellationToken cancellationToken = default)
     {
         var result = await mediator.SendQueryAsync<GetUsersPaginatedQuery, GetUsersPaginatedQueryResult>(
-            new GetUsersPaginatedQuery { Page = request.Page, PerPage = request.PerPage },
+            new GetUsersPaginatedQuery
+            {
+                Page = request.Page,
+                PerPage = request.PerPage,
+                RoleId = request.Role,
+                SupplierId = request.SupplierId
+            },
             cancellationToken);
 
         return Ok(result.Value);
@@ -31,4 +37,6 @@ public class GetUsersPaginatedRequest
 {
     public int Page { get; set; } = 1;
     public int PerPage { get; set; } = 10;
+    public Guid? Role { get; set; }
+    public Guid? SupplierId { get; set; }
 }

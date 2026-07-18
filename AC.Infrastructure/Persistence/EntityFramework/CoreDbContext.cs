@@ -1,4 +1,6 @@
-﻿using AC.Domain.Modules.Roles;
+﻿using AC.Domain.Modules.Articles;
+using AC.Domain.Modules.Roles;
+using AC.Domain.Modules.Suppliers;
 using AC.Domain.Modules.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +10,8 @@ public class CoreDbContext(DbContextOptions<CoreDbContext> options) : DbContext(
 {
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
+    public DbSet<Supplier> Suppliers { get; set; }
+    public DbSet<Article> Articles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

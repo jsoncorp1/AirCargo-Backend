@@ -28,7 +28,9 @@ public class GetUserByIdQueryHandler(
             PhoneNumber = user.PhoneNumber,
             Dni = user.Dni,
             RoleId = user.RoleId,
-            RoleName = user.Role.Name
+            RoleName = user.Role.Name,
+            SupplierId = user.SupplierId,
+            SupplierName = user.Supplier?.Name
         });
     }
 }

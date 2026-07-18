@@ -15,7 +15,7 @@ public class GetUsersPaginatedQueryHandler(IRepository<User> repository)
         int page = query.Page < 1 ? 1 : query.Page;
         int perPage = query.PerPage is < 1 or > 100 ? 10 : query.PerPage;
 
-        var spec = new UserPaginationSpecification(page, perPage);
+        var spec = new UserPaginationSpecification(page, perPage, query.RoleId, query.SupplierId);
         var result = await repository.GetPaginatedAsync(spec, cancellationToken);
 
         return Result.Success(new GetUsersPaginatedQueryResult
@@ -32,7 +32,9 @@ public class GetUsersPaginatedQueryHandler(IRepository<User> repository)
                 PhoneNumber = u.PhoneNumber,
                 Dni = u.Dni,
                 RoleId = u.RoleId,
-                RoleName = u.Role.Name
+                RoleName = u.Role.Name,
+                SupplierId = u.SupplierId,
+                SupplierName = u.Supplier != null ? u.Supplier.Name : null
             })
         });
     }

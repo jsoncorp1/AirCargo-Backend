@@ -20,4 +20,6 @@ public class UserPaginatedItem
     public string Dni { get; set; } = string.Empty;
     public Guid RoleId { get; set; }
     public string RoleName { get; set; } = string.Empty;
+    public Guid? SupplierId { get; set; }
+    public string? SupplierName { get; set; }
 }

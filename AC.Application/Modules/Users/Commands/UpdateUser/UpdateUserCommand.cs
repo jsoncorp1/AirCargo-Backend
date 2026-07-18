@@ -10,4 +10,5 @@ public class UpdateUserCommand : ICommand<UpdateUserCommandResult>
     public string PhoneNumber { get; set; } = string.Empty;
     public string Dni { get; set; } = string.Empty;
     public Guid RoleId { get; set; }
+    public Guid? SupplierId { get; set; }
 }

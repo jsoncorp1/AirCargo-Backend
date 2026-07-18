@@ -1,8 +1,10 @@
 ﻿using AC.Application.Abstractions.Messaging.Commands;
 using AC.Application.Modules.Roles.Specifications;
+using AC.Application.Modules.Suppliers.Specifications;
 using AC.Application.Modules.Users.Specifications;
 using AC.Application.Services.Security;
 using AC.Domain.Modules.Roles;
+using AC.Domain.Modules.Suppliers;
 using AC.Domain.Modules.Users;
 using AC.Domain.Persistence;
 using AC.Domain.Results;
@@ -12,6 +14,7 @@ namespace AC.Application.Modules.Users.Commands.CreateUser;
 public class CreateUserCommandHandler(
     IRepository<User> userRepository,
     IRepository<Role> roleRepository,
+    IRepository<Supplier> supplierRepository,
     IPasswordHasher passwordHasher,
     ICoreUnitOfWork unitOfWork)
     : ICommandHandler<CreateUserCommand, CreateUserCommandResult>
@@ -31,7 +34,8 @@ public class CreateUserCommandHandler(
             PasswordHash = passwordHasher.Hash(command.Password),
             PhoneNumber = command.PhoneNumber,
             Dni = command.Dni,
-            RoleId = command.RoleId
+            RoleId = command.RoleId,
+            SupplierId = command.SupplierId
         };
 
         await userRepository.SaveAsync(user, cancellationToken);
@@ -44,7 +48,8 @@ public class CreateUserCommandHandler(
             Email = user.Email,
             PhoneNumber = user.PhoneNumber,
             Dni = user.Dni,
-            RoleId = user.RoleId
+            RoleId = user.RoleId,
+            SupplierId = user.SupplierId
         });
     }
 
@@ -74,6 +79,15 @@ public class CreateUserCommandHandler(
 
         if (role is null)
             return Result.Fail("El rol indicado no existe.", "user.role.notfound");
+
+        if (command.SupplierId is not null)
+        {
+            var supplier = await supplierRepository.GetBySpecificationAsync(
+                new SupplierByIdSpecification(command.SupplierId.Value), cancellationToken);
+
+            if (supplier is null)
+                return Result.Fail("El proveedor indicado no existe.", "user.supplier.notfound");
+        }
 
         return Result.Success();
     }

@@ -8,4 +8,5 @@ public class CreateUserRequest
     public string? PhoneNumber { get; set; }
     public string? Dni { get; set; }
     public Guid RoleId { get; set; }
+    public Guid? SupplierId { get; set; }
 }
