@@ -82,7 +82,7 @@ public class CreateShipmentCommandHandler(
             NumeroGuia = shipment.Correlativo.ToString("D8"),
             TotalWeight = shipment.TotalWeight,
             ShippingPrice = shipment.ShippingPrice,
-            Details = details.Select(d => new ShipmentDetailResult
+            Details = details.Select(d => new CreateShipmentDetailResult
             {
                 Id = d.Id,
                 OrderDeliveryDetailId = d.OrderDeliveryDetailId,

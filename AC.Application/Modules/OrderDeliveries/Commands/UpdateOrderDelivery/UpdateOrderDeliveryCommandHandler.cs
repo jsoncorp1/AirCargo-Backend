@@ -132,7 +132,7 @@ public class UpdateOrderDeliveryCommandHandler(
             ClienteDireccion = order.ClienteDireccion,
             TipoEntrega = order.TipoEntrega,
             TotalPrice = order.TotalPrice,
-            Details = newDetails.Select(d => new OrderDeliveryDetailResult
+            Details = newDetails.Select(d => new UpdateOrderDeliveryDetailResult
             {
                 Id = d.Id,
                 ArticleId = d.ArticleId,

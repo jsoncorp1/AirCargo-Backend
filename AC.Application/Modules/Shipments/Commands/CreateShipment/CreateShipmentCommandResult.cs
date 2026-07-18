@@ -9,10 +9,10 @@ public class CreateShipmentCommandResult : ICommandResult
     public string NumeroGuia { get; set; } = string.Empty;
     public decimal TotalWeight { get; set; }
     public decimal ShippingPrice { get; set; }
-    public List<ShipmentDetailResult> Details { get; set; } = [];
+    public List<CreateShipmentDetailResult> Details { get; set; } = [];
 }
 
-public class ShipmentDetailResult
+public class CreateShipmentDetailResult
 {
     public Guid Id { get; set; }
     public Guid OrderDeliveryDetailId { get; set; }

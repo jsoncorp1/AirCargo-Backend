@@ -114,7 +114,7 @@ public class CreateOrderDeliveryCommandHandler(
             ClienteDireccion = orderDelivery.ClienteDireccion,
             TipoEntrega = orderDelivery.TipoEntrega,
             TotalPrice = orderDelivery.TotalPrice,
-            Details = details.Select(d => new OrderDeliveryDetailResult
+            Details = details.Select(d => new CreateOrderDeliveryDetailResult
             {
                 Id = d.Id,
                 ArticleId = d.ArticleId,

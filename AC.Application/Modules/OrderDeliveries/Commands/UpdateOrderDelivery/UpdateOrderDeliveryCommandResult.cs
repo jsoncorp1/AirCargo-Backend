@@ -14,10 +14,10 @@ public class UpdateOrderDeliveryCommandResult : ICommandResult
     public string ClienteDireccion { get; set; } = string.Empty;
     public TipoEntrega TipoEntrega { get; set; }
     public decimal TotalPrice { get; set; }
-    public List<OrderDeliveryDetailResult> Details { get; set; } = [];
+    public List<UpdateOrderDeliveryDetailResult> Details { get; set; } = [];
 }
 
-public class OrderDeliveryDetailResult
+public class UpdateOrderDeliveryDetailResult
 {
     public Guid Id { get; set; }
     public Guid ArticleId { get; set; }
