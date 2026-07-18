@@ -12,6 +12,6 @@ public class OrderDeliveryByIdSpecification : Specification<OrderDelivery>
             .Include(o => o.Supplier)
             .Include(o => o.User)
             .Include(o => o.OrderDeliveryDetails.Where(d => d.Active))
-            .Include(o => o.Shipment);
+            .Include(o => o.Shipments.Where(s => s.Active));
     }
 }

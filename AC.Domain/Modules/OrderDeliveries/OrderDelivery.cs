@@ -22,5 +22,9 @@ public class OrderDelivery : CoreEntity
     public decimal TotalPrice { get; set; }
 
     public ICollection<OrderDeliveryDetail> OrderDeliveryDetails { get; set; } = new List<OrderDeliveryDetail>();
-    public Shipment? Shipment { get; set; }
+
+    // Históricamente puede haber más de un Shipment (uno cancelado y otro nuevo);
+    // la regla de "a lo sumo un envío activo por orden" la aplica el índice único
+    // parcial (WHERE active) y la validación de negocio, no la cardinalidad EF.
+    public ICollection<Shipment> Shipments { get; set; } = new List<Shipment>();
 }

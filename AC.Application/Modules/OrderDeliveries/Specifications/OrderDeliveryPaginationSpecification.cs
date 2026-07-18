@@ -12,13 +12,13 @@ public class OrderDeliveryPaginationSpecification : PaginationSpecification<Orde
     {
         Query
             .Include(o => o.Supplier)
-            .Include(o => o.Shipment)
+            .Include(o => o.Shipments.Where(s => s.Active))
             .OrderByDescending(o => o.CreatedAt);
 
         if (supplierId is not null)
             Query.Where(o => o.SupplierId == supplierId);
 
         if (unattended is true)
-            Query.Where(o => o.Shipment == null || !o.Shipment.Active);
+            Query.Where(o => !o.Shipments.Any(s => s.Active));
     }
 }

@@ -24,7 +24,7 @@ public class CreateShipmentCommandHandler(
             return Result.Fail<CreateShipmentCommandResult>(
                 "Orden no encontrada.", "shipment.orderdelivery.notfound");
 
-        if (order.Shipment is { Active: true })
+        if (order.Shipments.Any(s => s.Active))
             return Result.Fail<CreateShipmentCommandResult>(
                 "La orden ya fue atendida.", "shipment.alreadyattended");
 

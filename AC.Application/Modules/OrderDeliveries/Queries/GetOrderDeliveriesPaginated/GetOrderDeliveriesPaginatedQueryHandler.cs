@@ -33,7 +33,7 @@ public class GetOrderDeliveriesPaginatedQueryHandler(IRepository<OrderDelivery> 
                 Departamento = o.Departamento.ToString(),
                 TipoEntrega = o.TipoEntrega.ToString(),
                 TotalPrice = o.TotalPrice,
-                IsAttended = o.Shipment is { Active: true },
+                IsAttended = o.Shipments.Any(s => s.Active),
                 CreatedAt = o.CreatedAt
             })
         });

@@ -32,7 +32,7 @@ public class GetOrderDeliveryByIdQueryHandler(IRepository<OrderDelivery> reposit
             ClienteDireccion = order.ClienteDireccion,
             TipoEntrega = order.TipoEntrega.ToString(),
             TotalPrice = order.TotalPrice,
-            IsAttended = order.Shipment is { Active: true },
+            IsAttended = order.Shipments.Any(s => s.Active),
             CreatedAt = order.CreatedAt,
             Details = order.OrderDeliveryDetails.Select(d => new OrderDeliveryDetailItem
             {

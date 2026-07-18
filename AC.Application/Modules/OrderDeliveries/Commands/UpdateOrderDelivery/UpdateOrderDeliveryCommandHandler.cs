@@ -25,7 +25,7 @@ public class UpdateOrderDeliveryCommandHandler(
             return Result.Fail<UpdateOrderDeliveryCommandResult>(
                 "Orden no encontrada.", "orderdelivery.notfound");
 
-        if (order.Shipment is { Active: true })
+        if (order.Shipments.Any(s => s.Active))
             return Result.Fail<UpdateOrderDeliveryCommandResult>(
                 "La orden ya fue atendida y no se puede editar.", "orderdelivery.alreadyattended");
 

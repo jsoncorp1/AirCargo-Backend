@@ -25,7 +25,7 @@ public class DeleteOrderDeliveryCommandHandler(
             return Result.Fail<DeleteOrderDeliveryCommandResult>(
                 "Orden no encontrada.", "orderdelivery.notfound");
 
-        if (order.Shipment is { Active: true })
+        if (order.Shipments.Any(s => s.Active))
             return Result.Fail<DeleteOrderDeliveryCommandResult>(
                 "La orden ya fue atendida y no se puede cancelar.", "orderdelivery.alreadyattended");
 

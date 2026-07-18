@@ -15,16 +15,25 @@ internal class EfShipmentConfig : IEntityTypeConfiguration<Shipment>
         builder.Property(s => s.ShippingPrice)
             .HasPrecision(18, 2);
 
-        // Correlativo único a nivel de tabla (incluye filas soft-deleted) para
-        // que el numero de guia autogenerado nunca se repita.
-        builder.HasIndex(s => s.Correlativo).IsUnique();
+        // Correlativo único solo entre envíos activos: MaxAsync (usado para generarlo)
+        // también solo mira filas activas, así que un envío cancelado no debe seguir
+        // "ocupando" su número frente a uno nuevo.
+        builder.HasIndex(s => s.Correlativo)
+            .IsUnique()
+            .HasFilter("active = true");
 
-        // Relación 1-1 con OrderDelivery: una orden tiene a lo sumo un envio.
+        // Relación N-1 con OrderDelivery: puede haber envíos históricos (cancelados)
+        // para la misma orden; "a lo sumo un envío activo" lo aplica el índice único
+        // parcial de abajo, no la cardinalidad de la relación.
         builder.HasOne(s => s.OrderDelivery)
-            .WithOne(o => o.Shipment)
-            .HasForeignKey<Shipment>(s => s.OrderDeliveryId)
+            .WithMany(o => o.Shipments)
+            .HasForeignKey(s => s.OrderDeliveryId)
             .IsRequired();
 
-        builder.HasIndex(s => s.OrderDeliveryId).IsUnique();
+        // Único solo entre envíos activos: si se cancela un envío, la orden debe
+        // poder recibir uno nuevo (mismo OrderDeliveryId) sin chocar contra el viejo.
+        builder.HasIndex(s => s.OrderDeliveryId)
+            .IsUnique()
+            .HasFilter("active = true");
     }
 }

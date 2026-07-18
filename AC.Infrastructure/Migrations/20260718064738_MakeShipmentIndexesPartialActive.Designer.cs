@@ -3,6 +3,7 @@ using System;
 using AC.Infrastructure.Persistence.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AC.Infrastructure.Migrations
 {
     [DbContext(typeof(CoreDbContext))]
-    partial class CoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260718064738_MakeShipmentIndexesPartialActive")]
+    partial class MakeShipmentIndexesPartialActive
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -705,8 +708,8 @@ namespace AC.Infrastructure.Migrations
             modelBuilder.Entity("AC.Domain.Modules.Shipments.Shipment", b =>
                 {
                     b.HasOne("AC.Domain.Modules.OrderDeliveries.OrderDelivery", "OrderDelivery")
-                        .WithMany("Shipments")
-                        .HasForeignKey("OrderDeliveryId")
+                        .WithOne("Shipment")
+                        .HasForeignKey("AC.Domain.Modules.Shipments.Shipment", "OrderDeliveryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_shipments_order_deliveries_order_delivery_id");
@@ -764,7 +767,7 @@ namespace AC.Infrastructure.Migrations
                 {
                     b.Navigation("OrderDeliveryDetails");
 
-                    b.Navigation("Shipments");
+                    b.Navigation("Shipment");
                 });
 
             modelBuilder.Entity("AC.Domain.Modules.Roles.Role", b =>
