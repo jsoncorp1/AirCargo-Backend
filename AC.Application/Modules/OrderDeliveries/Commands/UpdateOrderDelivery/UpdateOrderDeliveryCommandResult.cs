@@ -6,7 +6,7 @@ namespace AC.Application.Modules.OrderDeliveries.Commands.UpdateOrderDelivery;
 public class UpdateOrderDeliveryCommandResult : ICommandResult
 {
     public Guid Id { get; set; }
-    public Guid SupplierId { get; set; }
+    public Guid? SupplierId { get; set; }
     public Guid UserId { get; set; }
     public BolivianDepartment Department { get; set; }
     public string ClientPhone { get; set; } = string.Empty;
@@ -20,7 +20,7 @@ public class UpdateOrderDeliveryCommandResult : ICommandResult
 public class UpdateOrderDeliveryDetailResult
 {
     public Guid Id { get; set; }
-    public Guid ArticleId { get; set; }
+    public Guid? ArticleId { get; set; }
     public string ArticleName { get; set; } = string.Empty;
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }

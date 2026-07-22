@@ -14,8 +14,9 @@ public class GetOrderDeliveriesPaginatedQueryResult : IQueryResult
 public class OrderDeliveryPaginatedItem
 {
     public Guid Id { get; set; }
-    public Guid SupplierId { get; set; }
-    public string SupplierName { get; set; } = string.Empty;
+    public Guid? SupplierId { get; set; }
+    public string? SupplierName { get; set; }
+    public string OrderType { get; set; } = string.Empty;
     public string ClientFullName { get; set; } = string.Empty;
     public string Department { get; set; } = string.Empty;
     public string DeliveryType { get; set; } = string.Empty;

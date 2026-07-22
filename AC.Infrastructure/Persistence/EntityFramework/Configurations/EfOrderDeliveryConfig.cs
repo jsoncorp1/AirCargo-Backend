@@ -8,6 +8,11 @@ internal class EfOrderDeliveryConfig : IEntityTypeConfiguration<OrderDelivery>
 {
     public void Configure(EntityTypeBuilder<OrderDelivery> builder)
     {
+        builder.Property(o => o.OrderType)
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .IsRequired();
+
         builder.Property(o => o.Department)
             .HasConversion<string>()
             .HasMaxLength(20)

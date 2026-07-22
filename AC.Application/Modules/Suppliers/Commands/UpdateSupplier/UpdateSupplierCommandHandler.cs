@@ -29,6 +29,7 @@ public class UpdateSupplierCommandHandler(
 
         supplier.Name = command.Name;
         supplier.Description = command.Description;
+        supplier.Department = command.Department;
 
         await repository.UpdateAsync(supplier, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -36,7 +37,8 @@ public class UpdateSupplierCommandHandler(
         return Result.Success(new UpdateSupplierCommandResult
         {
             Id = supplier.Id,
-            Name = supplier.Name
+            Name = supplier.Name,
+            Department = supplier.Department
         });
     }
 }

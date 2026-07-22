@@ -33,16 +33,25 @@ public class DeleteOrderDeliveryCommandHandler(
 
         foreach (var detail in order.OrderDeliveryDetails)
         {
-            if (!articleCache.TryGetValue(detail.ArticleId, out var article))
+            // Líneas esporádicas no tienen Article (no descuentan/restituyen inventario).
+            if (detail.ArticleId is null)
+            {
+                detail.Active = false;
+                continue;
+            }
+
+            var articleId = detail.ArticleId.Value;
+
+            if (!articleCache.TryGetValue(articleId, out var article))
             {
                 article = await articleRepository.GetBySpecificationAsync(
-                    new ArticleByIdSpecification(detail.ArticleId), cancellationToken);
+                    new ArticleByIdSpecification(articleId), cancellationToken);
 
                 if (article is null)
                     return Result.Fail<DeleteOrderDeliveryCommandResult>(
                         "Uno de los artículos de la orden ya no existe.", "orderdelivery.article.notfound");
 
-                articleCache[detail.ArticleId] = article;
+                articleCache[articleId] = article;
             }
 
             article.Count += detail.Quantity;

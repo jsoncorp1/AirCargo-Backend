@@ -26,6 +26,11 @@ public class CreateUserCommandHandler(
         if (validation.Failure)
             return Result.Fail<CreateUserCommandResult>(validation.Error, validation.ErrorKey);
 
+        Supplier? supplier = command.SupplierId is null
+            ? null
+            : await supplierRepository.GetBySpecificationAsync(
+                new SupplierByIdSpecification(command.SupplierId.Value), cancellationToken);
+
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -39,6 +44,13 @@ public class CreateUserCommandHandler(
         };
 
         await userRepository.SaveAsync(user, cancellationToken);
+
+        if (supplier is not null)
+        {
+            supplier.UserQuantity += 1;
+            await supplierRepository.UpdateAsync(supplier, cancellationToken);
+        }
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success(new CreateUserCommandResult

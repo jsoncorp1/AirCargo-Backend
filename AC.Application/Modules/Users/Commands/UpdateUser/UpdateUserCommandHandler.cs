@@ -39,15 +39,19 @@ public class UpdateUserCommandHandler(
         if (role is null)
             return Result.Fail<UpdateUserCommandResult>("El rol indicado no existe.", "user.role.notfound");
 
+        Supplier? newSupplier = null;
+
         if (command.SupplierId is not null)
         {
-            var supplier = await supplierRepository.GetBySpecificationAsync(
+            newSupplier = await supplierRepository.GetBySpecificationAsync(
                 new SupplierByIdSpecification(command.SupplierId.Value), cancellationToken);
 
-            if (supplier is null)
+            if (newSupplier is null)
                 return Result.Fail<UpdateUserCommandResult>(
                     "El proveedor indicado no existe.", "user.supplier.notfound");
         }
+
+        var previousSupplier = user.Supplier;
 
         user.FullName = command.FullName;
         user.Email = command.Email.Trim().ToLowerInvariant();
@@ -55,8 +59,25 @@ public class UpdateUserCommandHandler(
         user.Dni = command.Dni;
         user.RoleId = command.RoleId;
         user.SupplierId = command.SupplierId;
+        user.Supplier = newSupplier;
 
         await userRepository.UpdateAsync(user, cancellationToken);
+
+        if (previousSupplier?.Id != newSupplier?.Id)
+        {
+            if (previousSupplier is not null)
+            {
+                previousSupplier.UserQuantity = Math.Max(0, previousSupplier.UserQuantity - 1);
+                await supplierRepository.UpdateAsync(previousSupplier, cancellationToken);
+            }
+
+            if (newSupplier is not null)
+            {
+                newSupplier.UserQuantity += 1;
+                await supplierRepository.UpdateAsync(newSupplier, cancellationToken);
+            }
+        }
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success(new UpdateUserCommandResult

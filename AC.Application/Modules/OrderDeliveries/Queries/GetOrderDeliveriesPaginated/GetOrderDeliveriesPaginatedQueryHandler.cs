@@ -28,7 +28,8 @@ public class GetOrderDeliveriesPaginatedQueryHandler(IRepository<OrderDelivery> 
             {
                 Id = o.Id,
                 SupplierId = o.SupplierId,
-                SupplierName = o.Supplier.Name,
+                SupplierName = o.Supplier?.Name,
+                OrderType = o.OrderType.ToString(),
                 ClientFullName = o.ClientFullName,
                 Department = o.Department.ToString(),
                 DeliveryType = o.DeliveryType.ToString(),

@@ -24,6 +24,7 @@ public class GetShipmentByIdQueryHandler(IRepository<Shipment> repository)
             Id = shipment.Id,
             OrderDeliveryId = shipment.OrderDeliveryId,
             WaybillNumber = shipment.SequenceNumber.ToString("D8"),
+            Code = shipment.Code,
             ClientFullName = shipment.OrderDelivery.ClientFullName,
             ClientAddress = shipment.OrderDelivery.ClientAddress,
             Department = shipment.OrderDelivery.Department.ToString(),

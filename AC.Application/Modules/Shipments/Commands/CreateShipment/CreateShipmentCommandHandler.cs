@@ -52,12 +52,14 @@ public class CreateShipmentCommandHandler(
         }
 
         int sequenceNumber = (await shipmentRepository.MaxAsync(s => s.SequenceNumber, cancellationToken) ?? 0) + 1;
+        string code = ShipmentCodeFormatter.Format(order.OrderType, order.DeliveryType, sequenceNumber);
 
         var shipment = new Shipment
         {
             Id = Guid.NewGuid(),
             OrderDeliveryId = order.Id,
             SequenceNumber = sequenceNumber,
+            Code = code,
             TotalWeight = command.Lines.Sum(l => l.Weight),
             ShippingPrice = command.Lines.Sum(l => l.ShippingCost)
         };
@@ -80,6 +82,7 @@ public class CreateShipmentCommandHandler(
             Id = shipment.Id,
             OrderDeliveryId = shipment.OrderDeliveryId,
             WaybillNumber = shipment.SequenceNumber.ToString("D8"),
+            Code = shipment.Code,
             TotalWeight = shipment.TotalWeight,
             ShippingPrice = shipment.ShippingPrice,
             Details = details.Select(d => new CreateShipmentDetailResult

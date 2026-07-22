@@ -33,6 +33,10 @@ public class UpdateOrderDeliveryCommandHandler(
             return Result.Fail<UpdateOrderDeliveryCommandResult>(
                 "La orden debe tener al menos una línea.", "orderdelivery.lines.required");
 
+        if (order.OrderType != OrderType.Corporate)
+            return Result.Fail<UpdateOrderDeliveryCommandResult>(
+                "Solo las órdenes corporativas pueden editarse por este medio.", "orderdelivery.update.notsupported");
+
         var articleCache = new Dictionary<Guid, Article>();
 
         async Task<Result<Article>> GetOrCacheArticleAsync(Guid articleId)
@@ -55,7 +59,7 @@ public class UpdateOrderDeliveryCommandHandler(
 
         foreach (var oldDetail in oldDetails)
         {
-            var articleResult = await GetOrCacheArticleAsync(oldDetail.ArticleId);
+            var articleResult = await GetOrCacheArticleAsync(oldDetail.ArticleId!.Value);
             if (articleResult.Failure)
                 return Result.Fail<UpdateOrderDeliveryCommandResult>(
                     articleResult.Error, articleResult.ErrorKey);

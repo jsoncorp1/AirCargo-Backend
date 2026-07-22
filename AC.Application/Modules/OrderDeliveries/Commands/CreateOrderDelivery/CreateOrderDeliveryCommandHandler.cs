@@ -87,6 +87,7 @@ public class CreateOrderDeliveryCommandHandler(
             Id = Guid.NewGuid(),
             SupplierId = supplierId,
             UserId = command.UserId,
+            OrderType = OrderType.Corporate,
             Department = command.Department,
             ClientPhone = command.ClientPhone,
             ClientFullName = command.ClientFullName,
@@ -108,6 +109,7 @@ public class CreateOrderDeliveryCommandHandler(
             Id = orderDelivery.Id,
             SupplierId = orderDelivery.SupplierId,
             UserId = orderDelivery.UserId,
+            OrderType = orderDelivery.OrderType,
             Department = orderDelivery.Department,
             ClientPhone = orderDelivery.ClientPhone,
             ClientFullName = orderDelivery.ClientFullName,
@@ -117,7 +119,7 @@ public class CreateOrderDeliveryCommandHandler(
             Details = details.Select(d => new CreateOrderDeliveryDetailResult
             {
                 Id = d.Id,
-                ArticleId = d.ArticleId,
+                ArticleId = d.ArticleId!.Value,
                 ArticleName = d.ArticleName,
                 Quantity = d.Quantity,
                 UnitPrice = d.UnitPrice,

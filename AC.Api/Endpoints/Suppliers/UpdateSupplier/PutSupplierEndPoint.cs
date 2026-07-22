@@ -1,6 +1,7 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Modules.Suppliers.Commands.UpdateSupplier;
+using AC.Domain.Modules.OrderDeliveries;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -24,7 +25,8 @@ public class PutSupplierEndPoint(IMediator mediator)
         {
             Id = request.Id,
             Name = request.Body.Name,
-            Description = request.Body.Description ?? string.Empty
+            Description = request.Body.Description ?? string.Empty,
+            Department = request.Body.Department
         };
 
         var result = await mediator.SendCommandAsync<UpdateSupplierCommand, UpdateSupplierCommandResult>(
@@ -53,4 +55,5 @@ public class PutSupplierBody
 {
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
+    public BolivianDepartment Department { get; set; }
 }

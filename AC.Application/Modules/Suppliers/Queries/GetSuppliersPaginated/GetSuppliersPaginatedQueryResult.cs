@@ -16,4 +16,7 @@ public class SupplierPaginatedItem
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
+    public string Department { get; set; } = string.Empty;
+    public int ArticleQuantity { get; set; }
+    public int UserQuantity { get; set; }
 }

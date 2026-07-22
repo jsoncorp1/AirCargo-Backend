@@ -37,12 +37,26 @@ public class UpdateArticleCommandHandler(
             return Result.Fail<UpdateArticleCommandResult>(
                 "El proveedor indicado no existe.", "article.supplier.notfound");
 
+        var supplierChanged = article.SupplierId != command.SupplierId;
+        var previousSupplier = article.Supplier;
+
         article.Sku = command.Sku;
         article.Name = command.Name;
         article.Price = command.Price;
         article.SupplierId = command.SupplierId;
+        article.Supplier = supplier;
 
         await articleRepository.UpdateAsync(article, cancellationToken);
+
+        if (supplierChanged)
+        {
+            previousSupplier.ArticleQuantity = Math.Max(0, previousSupplier.ArticleQuantity - 1);
+            supplier.ArticleQuantity += 1;
+
+            await supplierRepository.UpdateAsync(previousSupplier, cancellationToken);
+            await supplierRepository.UpdateAsync(supplier, cancellationToken);
+        }
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success(new UpdateArticleCommandResult

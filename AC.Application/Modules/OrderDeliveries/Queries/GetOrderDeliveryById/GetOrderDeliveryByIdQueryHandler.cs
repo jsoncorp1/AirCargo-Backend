@@ -23,9 +23,10 @@ public class GetOrderDeliveryByIdQueryHandler(IRepository<OrderDelivery> reposit
         {
             Id = order.Id,
             SupplierId = order.SupplierId,
-            SupplierName = order.Supplier.Name,
+            SupplierName = order.Supplier?.Name,
             UserId = order.UserId,
             UserName = order.User.FullName,
+            OrderType = order.OrderType.ToString(),
             Department = order.Department.ToString(),
             ClientPhone = order.ClientPhone,
             ClientFullName = order.ClientFullName,

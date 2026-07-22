@@ -6,8 +6,9 @@ namespace AC.Application.Modules.OrderDeliveries.Commands.CreateOrderDelivery;
 public class CreateOrderDeliveryCommandResult : ICommandResult
 {
     public Guid Id { get; set; }
-    public Guid SupplierId { get; set; }
+    public Guid? SupplierId { get; set; }
     public Guid UserId { get; set; }
+    public OrderType OrderType { get; set; }
     public BolivianDepartment Department { get; set; }
     public string ClientPhone { get; set; } = string.Empty;
     public string ClientFullName { get; set; } = string.Empty;

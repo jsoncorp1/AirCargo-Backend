@@ -22,7 +22,10 @@ public class GetSupplierByIdQueryHandler(IRepository<Supplier> repository)
         {
             Id = supplier.Id,
             Name = supplier.Name,
-            Description = supplier.Description
+            Description = supplier.Description,
+            Department = supplier.Department.ToString(),
+            ArticleQuantity = supplier.ArticleQuantity,
+            UserQuantity = supplier.UserQuantity
         });
     }
 }

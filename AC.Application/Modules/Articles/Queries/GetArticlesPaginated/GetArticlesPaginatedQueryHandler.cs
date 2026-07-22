@@ -15,7 +15,7 @@ public class GetArticlesPaginatedQueryHandler(IRepository<Article> repository)
         int page = query.Page < 1 ? 1 : query.Page;
         int perPage = query.PerPage is < 1 or > 100 ? 10 : query.PerPage;
 
-        var spec = new ArticlePaginationSpecification(page, perPage, query.SupplierId);
+        var spec = new ArticlePaginationSpecification(page, perPage, query.SupplierId, query.ArticleName);
         var result = await repository.GetPaginatedAsync(spec, cancellationToken);
 
         return Result.Success(new GetArticlesPaginatedQueryResult

@@ -15,7 +15,7 @@ public class GetSuppliersPaginatedQueryHandler(IRepository<Supplier> repository)
         int page = query.Page < 1 ? 1 : query.Page;
         int perPage = query.PerPage is < 1 or > 100 ? 10 : query.PerPage;
 
-        var spec = new SupplierPaginationSpecification(page, perPage);
+        var spec = new SupplierPaginationSpecification(page, perPage, query.Department);
         var result = await repository.GetPaginatedAsync(spec, cancellationToken);
 
         return Result.Success(new GetSuppliersPaginatedQueryResult
@@ -28,7 +28,10 @@ public class GetSuppliersPaginatedQueryHandler(IRepository<Supplier> repository)
             {
                 Id = s.Id,
                 Name = s.Name,
-                Description = s.Description
+                Description = s.Description,
+                Department = s.Department.ToString(),
+                ArticleQuantity = s.ArticleQuantity,
+                UserQuantity = s.UserQuantity
             })
         });
     }

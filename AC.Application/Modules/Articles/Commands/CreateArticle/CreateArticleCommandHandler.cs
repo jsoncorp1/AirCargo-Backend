@@ -17,9 +17,11 @@ public class CreateArticleCommandHandler(
     public async Task<Result<CreateArticleCommandResult>> HandleAsync(
         CreateArticleCommand command, CancellationToken cancellationToken)
     {
-        Result validation = await ValidateAsync(command, cancellationToken);
+        Result<Supplier> validation = await ValidateAsync(command, cancellationToken);
         if (validation.Failure)
             return Result.Fail<CreateArticleCommandResult>(validation.Error, validation.ErrorKey);
+
+        var supplier = validation.Value;
 
         var article = new Article
         {
@@ -31,7 +33,10 @@ public class CreateArticleCommandHandler(
             SupplierId = command.SupplierId
         };
 
+        supplier.ArticleQuantity += 1;
+
         await articleRepository.SaveAsync(article, cancellationToken);
+        await supplierRepository.UpdateAsync(supplier, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success(new CreateArticleCommandResult
@@ -45,30 +50,30 @@ public class CreateArticleCommandHandler(
         });
     }
 
-    private async Task<Result> ValidateAsync(
+    private async Task<Result<Supplier>> ValidateAsync(
         CreateArticleCommand command, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(command.Sku))
-            return Result.Fail("El SKU es obligatorio.", "article.sku.required");
+            return Result.Fail<Supplier>("El SKU es obligatorio.", "article.sku.required");
 
         if (string.IsNullOrWhiteSpace(command.Name))
-            return Result.Fail("El nombre es obligatorio.", "article.name.required");
+            return Result.Fail<Supplier>("El nombre es obligatorio.", "article.name.required");
 
         if (command.SupplierId == Guid.Empty)
-            return Result.Fail("El proveedor es obligatorio.", "article.supplierid.required");
+            return Result.Fail<Supplier>("El proveedor es obligatorio.", "article.supplierid.required");
 
         var existingSku = await articleRepository.GetBySpecificationAsync(
             new ArticleBySkuSpecification(command.Sku), cancellationToken);
 
         if (existingSku is not null)
-            return Result.Fail("Ya existe un artículo con ese SKU.", "article.sku.duplicate");
+            return Result.Fail<Supplier>("Ya existe un artículo con ese SKU.", "article.sku.duplicate");
 
         var supplier = await supplierRepository.GetBySpecificationAsync(
             new SupplierByIdSpecification(command.SupplierId), cancellationToken);
 
         if (supplier is null)
-            return Result.Fail("El proveedor indicado no existe.", "article.supplier.notfound");
+            return Result.Fail<Supplier>("El proveedor indicado no existe.", "article.supplier.notfound");
 
-        return Result.Success();
+        return Result.Success(supplier);
     }
 }

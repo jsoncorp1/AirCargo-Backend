@@ -7,6 +7,7 @@ public class GetShipmentByIdQueryResult : IQueryResult
     public Guid Id { get; set; }
     public Guid OrderDeliveryId { get; set; }
     public string WaybillNumber { get; set; } = string.Empty;
+    public string Code { get; set; } = string.Empty;
     public string ClientFullName { get; set; } = string.Empty;
     public string ClientAddress { get; set; } = string.Empty;
     public string Department { get; set; } = string.Empty;

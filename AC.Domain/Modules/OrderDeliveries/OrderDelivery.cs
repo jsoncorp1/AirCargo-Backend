@@ -7,12 +7,13 @@ namespace AC.Domain.Modules.OrderDeliveries;
 
 public class OrderDelivery : CoreEntity
 {
-    public Guid SupplierId { get; set; }
-    public Supplier Supplier { get; set; } = null!;
+    public Guid? SupplierId { get; set; }
+    public Supplier? Supplier { get; set; }
 
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
 
+    public OrderType OrderType { get; set; }
     public BolivianDepartment Department { get; set; }
     public string ClientPhone { get; set; } = string.Empty;
     public string ClientFullName { get; set; } = string.Empty;

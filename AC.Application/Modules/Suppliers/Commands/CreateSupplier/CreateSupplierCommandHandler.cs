@@ -22,7 +22,8 @@ public class CreateSupplierCommandHandler(
         {
             Id = Guid.NewGuid(),
             Name = command.Name,
-            Description = command.Description
+            Description = command.Description,
+            Department = command.Department
         };
 
         await repository.SaveAsync(supplier, cancellationToken);
@@ -31,7 +32,8 @@ public class CreateSupplierCommandHandler(
         return Result.Success(new CreateSupplierCommandResult
         {
             Id = supplier.Id,
-            Name = supplier.Name
+            Name = supplier.Name,
+            Department = supplier.Department
         });
     }
 

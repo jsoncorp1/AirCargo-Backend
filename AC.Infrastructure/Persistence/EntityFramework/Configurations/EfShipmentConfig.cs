@@ -9,6 +9,10 @@ internal class EfShipmentConfig : IEntityTypeConfiguration<Shipment>
 {
     public void Configure(EntityTypeBuilder<Shipment> builder)
     {
+        builder.Property(s => s.Code)
+            .IsRequired()
+            .HasMaxLength(20);
+
         builder.Property(s => s.TotalWeight)
             .HasPrecision(18, 2);
 

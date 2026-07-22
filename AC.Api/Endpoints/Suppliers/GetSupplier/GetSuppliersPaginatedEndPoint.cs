@@ -1,6 +1,7 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Modules.Suppliers.Queries.GetSuppliersPaginated;
+using AC.Domain.Modules.OrderDeliveries;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -20,7 +21,12 @@ public class GetSuppliersPaginatedEndPoint(IMediator mediator)
         CancellationToken cancellationToken = default)
     {
         var result = await mediator.SendQueryAsync<GetSuppliersPaginatedQuery, GetSuppliersPaginatedQueryResult>(
-            new GetSuppliersPaginatedQuery { Page = request.Page, PerPage = request.PerPage },
+            new GetSuppliersPaginatedQuery
+            {
+                Page = request.Page,
+                PerPage = request.PerPage,
+                Department = request.Department
+            },
             cancellationToken);
 
         return Ok(result.Value);
@@ -31,4 +37,5 @@ public class GetSuppliersPaginatedRequest
 {
     public int Page { get; set; } = 1;
     public int PerPage { get; set; } = 10;
+    public BolivianDepartment? Department { get; set; }
 }

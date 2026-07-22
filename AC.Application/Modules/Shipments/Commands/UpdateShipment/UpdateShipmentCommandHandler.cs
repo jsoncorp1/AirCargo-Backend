@@ -64,6 +64,7 @@ public class UpdateShipmentCommandHandler(
             Id = shipment.Id,
             OrderDeliveryId = shipment.OrderDeliveryId,
             WaybillNumber = shipment.SequenceNumber.ToString("D8"),
+            Code = shipment.Code,
             TotalWeight = shipment.TotalWeight,
             ShippingPrice = shipment.ShippingPrice,
             Details = shipment.ShipmentDetails.Select(d => new UpdateShipmentDetailResult

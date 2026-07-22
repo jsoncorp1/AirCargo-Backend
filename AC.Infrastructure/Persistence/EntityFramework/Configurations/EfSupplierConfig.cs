@@ -12,6 +12,11 @@ internal class EfSupplierConfig : IEntityTypeConfiguration<Supplier>
             .IsRequired()
             .HasMaxLength(100);
 
+        builder.Property(s => s.Department)
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .IsRequired();
+
         // La relación 1-N con User se arma sola por convención
         // (User.SupplierId + User.Supplier + Supplier.Users); el delete queda en
         // Restrict por el loop global del CoreDbContext.

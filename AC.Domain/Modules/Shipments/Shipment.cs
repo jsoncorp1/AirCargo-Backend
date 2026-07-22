@@ -9,6 +9,7 @@ public class Shipment : CoreEntity
     public OrderDelivery OrderDelivery { get; set; } = null!;
 
     public int SequenceNumber { get; set; }
+    public string Code { get; set; } = string.Empty;
     public decimal TotalWeight { get; set; }
     public decimal ShippingPrice { get; set; }
 

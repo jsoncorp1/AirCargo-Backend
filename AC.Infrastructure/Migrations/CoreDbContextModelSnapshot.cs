@@ -203,7 +203,13 @@ namespace AC.Infrastructure.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("department");
 
-                    b.Property<Guid>("SupplierId")
+                    b.Property<string>("OrderType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("order_type");
+
+                    b.Property<Guid?>("SupplierId")
                         .HasColumnType("uuid")
                         .HasColumnName("supplier_id");
 
@@ -247,7 +253,7 @@ namespace AC.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("active");
 
-                    b.Property<Guid>("ArticleId")
+                    b.Property<Guid?>("ArticleId")
                         .HasColumnType("uuid")
                         .HasColumnName("article_id");
 
@@ -375,6 +381,12 @@ namespace AC.Infrastructure.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("boolean")
                         .HasColumnName("active");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("code");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -512,6 +524,10 @@ namespace AC.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("active");
 
+                    b.Property<int>("ArticleQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("article_quantity");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -528,6 +544,12 @@ namespace AC.Infrastructure.Migrations
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text")
                         .HasColumnName("deleted_by");
+
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("department");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -547,6 +569,10 @@ namespace AC.Infrastructure.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("text")
                         .HasColumnName("updated_by");
+
+                    b.Property<int>("UserQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_quantity");
 
                     b.HasKey("Id")
                         .HasName("pk_suppliers");
@@ -666,7 +692,6 @@ namespace AC.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("fk_order_deliveries_suppliers_supplier_id");
 
                     b.HasOne("AC.Domain.Modules.Users.User", "User")
@@ -687,7 +712,6 @@ namespace AC.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("ArticleId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("fk_order_delivery_details_articles_article_id");
 
                     b.HasOne("AC.Domain.Modules.OrderDeliveries.OrderDelivery", "OrderDelivery")

@@ -7,6 +7,7 @@ public class UpdateShipmentCommandResult : ICommandResult
     public Guid Id { get; set; }
     public Guid OrderDeliveryId { get; set; }
     public string WaybillNumber { get; set; } = string.Empty;
+    public string Code { get; set; } = string.Empty;
     public decimal TotalWeight { get; set; }
     public decimal ShippingPrice { get; set; }
     public List<UpdateShipmentDetailResult> Details { get; set; } = [];

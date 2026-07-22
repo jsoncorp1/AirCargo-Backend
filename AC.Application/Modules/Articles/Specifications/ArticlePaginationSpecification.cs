@@ -6,7 +6,8 @@ namespace AC.Application.Modules.Articles.Specifications;
 
 public class ArticlePaginationSpecification : PaginationSpecification<Article>
 {
-    public ArticlePaginationSpecification(int page, int perPage, Guid? supplierId = null)
+    public ArticlePaginationSpecification(
+        int page, int perPage, Guid? supplierId = null, string? articleName = null)
         : base(page, perPage)
     {
         Query
@@ -15,5 +16,11 @@ public class ArticlePaginationSpecification : PaginationSpecification<Article>
 
         if (supplierId is not null)
             Query.Where(a => a.SupplierId == supplierId);
+
+        if (!string.IsNullOrWhiteSpace(articleName))
+        {
+            string normalizedName = articleName.Trim().ToLowerInvariant();
+            Query.Where(a => a.Name.ToLower().Contains(normalizedName));
+        }
     }
 }
