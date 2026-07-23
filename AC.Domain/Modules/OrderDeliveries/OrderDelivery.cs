@@ -14,7 +14,18 @@ public class OrderDelivery : CoreEntity
     public User User { get; set; } = null!;
 
     public OrderType OrderType { get; set; }
-    public BolivianDepartment Department { get; set; }
+
+    // Origen del envío: en corporativo es un snapshot de Supplier.Department/Name
+    // tomado al crear la orden (no navega Supplier en caliente, así una guía
+    // histórica no cambia si el proveedor se muda o se renombra después);
+    // en esporádico lo carga el mostrador a mano.
+    public BolivianDepartment OriginDepartment { get; set; }
+    public string SenderFullName { get; set; } = string.Empty;
+    public string SenderPhone { get; set; } = string.Empty;
+    public string SenderAddress { get; set; } = string.Empty;
+
+    // Destino y datos del destinatario (antes "Department"/"Client*").
+    public BolivianDepartment DestinationDepartment { get; set; }
     public string ClientPhone { get; set; } = string.Empty;
     public string ClientFullName { get; set; } = string.Empty;
     public string ClientAddress { get; set; } = string.Empty;

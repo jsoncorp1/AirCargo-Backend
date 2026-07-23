@@ -1,5 +1,6 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
+using AC.Application.Abstractions.Security;
 using AC.Application.Modules.OrderDeliveries.Commands.CreateOrderDelivery;
 using AC.Domain.Modules.OrderDeliveries;
 using Ardalis.ApiEndpoints;
@@ -8,7 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.OrderDeliveries.CreateOrderDelivery;
 
-public class PostOrderDeliveryEndPoint(IMediator mediator)
+public class PostOrderDeliveryEndPoint(IMediator mediator, ICurrentUser currentUser)
     : EndpointBaseAsync
         .WithRequest<CreateOrderDeliveryRequest>
         .WithActionResult<CreateOrderDeliveryCommandResult>
@@ -22,8 +23,8 @@ public class PostOrderDeliveryEndPoint(IMediator mediator)
     {
         var command = new CreateOrderDeliveryCommand
         {
-            UserId = request.UserId,
-            Department = request.Department,
+            UserId = currentUser.UserId!.Value,
+            DestinationDepartment = request.DestinationDepartment,
             ClientPhone = request.ClientPhone,
             ClientFullName = request.ClientFullName,
             ClientAddress = request.ClientAddress,
@@ -47,8 +48,7 @@ public class PostOrderDeliveryEndPoint(IMediator mediator)
 
 public class CreateOrderDeliveryRequest
 {
-    public Guid UserId { get; set; }
-    public BolivianDepartment Department { get; set; }
+    public BolivianDepartment DestinationDepartment { get; set; }
     public string ClientPhone { get; set; } = null!;
     public string ClientFullName { get; set; } = null!;
     public string ClientAddress { get; set; } = null!;

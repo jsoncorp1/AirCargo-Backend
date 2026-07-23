@@ -2,11 +2,13 @@
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Modules.Auth.Commands.Login;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Auth.Login;
 
+[AllowAnonymous]
 public class PostLoginEndPoint(IMediator mediator)
     : EndpointBaseAsync
         .WithRequest<LoginRequest>

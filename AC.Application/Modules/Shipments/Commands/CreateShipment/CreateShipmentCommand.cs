@@ -5,6 +5,8 @@ namespace AC.Application.Modules.Shipments.Commands.CreateShipment;
 public class CreateShipmentCommand : ICommand<CreateShipmentCommandResult>
 {
     public Guid OrderDeliveryId { get; set; }
+    public int PackageCount { get; set; }
+    public string PackageDescription { get; set; } = string.Empty;
     public List<CreateShipmentLine> Lines { get; set; } = [];
 }
 

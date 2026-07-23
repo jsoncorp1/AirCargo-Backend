@@ -20,5 +20,6 @@ public class ShipmentPaginatedItem
     public string ClientFullName { get; set; } = string.Empty;
     public decimal TotalWeight { get; set; }
     public decimal ShippingPrice { get; set; }
+    public int PackageCount { get; set; }
     public DateTime CreatedAt { get; set; }
 }

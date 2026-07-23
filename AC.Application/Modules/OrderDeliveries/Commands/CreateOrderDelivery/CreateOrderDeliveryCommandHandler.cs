@@ -88,7 +88,11 @@ public class CreateOrderDeliveryCommandHandler(
             SupplierId = supplierId,
             UserId = command.UserId,
             OrderType = OrderType.Corporate,
-            Department = command.Department,
+            // Snapshot del proveedor como emisor: si el proveedor cambia de
+            // departamento o de nombre después, esta orden ya creada no debe verse afectada.
+            OriginDepartment = user.Supplier!.Department,
+            SenderFullName = user.Supplier.Name,
+            DestinationDepartment = command.DestinationDepartment,
             ClientPhone = command.ClientPhone,
             ClientFullName = command.ClientFullName,
             ClientAddress = command.ClientAddress,
@@ -110,7 +114,9 @@ public class CreateOrderDeliveryCommandHandler(
             SupplierId = orderDelivery.SupplierId,
             UserId = orderDelivery.UserId,
             OrderType = orderDelivery.OrderType,
-            Department = orderDelivery.Department,
+            OriginDepartment = orderDelivery.OriginDepartment,
+            SenderFullName = orderDelivery.SenderFullName,
+            DestinationDepartment = orderDelivery.DestinationDepartment,
             ClientPhone = orderDelivery.ClientPhone,
             ClientFullName = orderDelivery.ClientFullName,
             ClientAddress = orderDelivery.ClientAddress,

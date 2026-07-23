@@ -24,7 +24,7 @@ public class PutOrderDeliveryEndPoint(IMediator mediator)
         var command = new UpdateOrderDeliveryCommand
         {
             Id = request.Id,
-            Department = request.Body.Department,
+            DestinationDepartment = request.Body.DestinationDepartment,
             ClientPhone = request.Body.ClientPhone,
             ClientFullName = request.Body.ClientFullName,
             ClientAddress = request.Body.ClientAddress,
@@ -61,7 +61,7 @@ public class PutOrderDeliveryRequest
 
 public class PutOrderDeliveryBody
 {
-    public BolivianDepartment Department { get; set; }
+    public BolivianDepartment DestinationDepartment { get; set; }
     public string ClientPhone { get; set; } = null!;
     public string ClientFullName { get; set; } = null!;
     public string ClientAddress { get; set; } = null!;

@@ -13,5 +13,10 @@ public class Shipment : CoreEntity
     public decimal TotalWeight { get; set; }
     public decimal ShippingPrice { get; set; }
 
+    // Cómo viene agrupado físicamente el envío (ej. "3 cajas y 2 sobres"),
+    // independiente de cuántas líneas/artículos tenga el detalle.
+    public int PackageCount { get; set; }
+    public string PackageDescription { get; set; } = string.Empty;
+
     public ICollection<ShipmentDetail> ShipmentDetails { get; set; } = new List<ShipmentDetail>();
 }

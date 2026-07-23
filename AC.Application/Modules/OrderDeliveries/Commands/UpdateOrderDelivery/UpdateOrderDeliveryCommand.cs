@@ -6,7 +6,7 @@ namespace AC.Application.Modules.OrderDeliveries.Commands.UpdateOrderDelivery;
 public class UpdateOrderDeliveryCommand : ICommand<UpdateOrderDeliveryCommandResult>
 {
     public Guid Id { get; set; }
-    public BolivianDepartment Department { get; set; }
+    public BolivianDepartment DestinationDepartment { get; set; }
     public string ClientPhone { get; set; } = string.Empty;
     public string ClientFullName { get; set; } = string.Empty;
     public string ClientAddress { get; set; } = string.Empty;

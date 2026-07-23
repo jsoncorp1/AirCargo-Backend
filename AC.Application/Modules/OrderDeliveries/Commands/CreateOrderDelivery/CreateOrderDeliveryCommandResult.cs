@@ -9,7 +9,9 @@ public class CreateOrderDeliveryCommandResult : ICommandResult
     public Guid? SupplierId { get; set; }
     public Guid UserId { get; set; }
     public OrderType OrderType { get; set; }
-    public BolivianDepartment Department { get; set; }
+    public BolivianDepartment OriginDepartment { get; set; }
+    public string SenderFullName { get; set; } = string.Empty;
+    public BolivianDepartment DestinationDepartment { get; set; }
     public string ClientPhone { get; set; } = string.Empty;
     public string ClientFullName { get; set; } = string.Empty;
     public string ClientAddress { get; set; } = string.Empty;

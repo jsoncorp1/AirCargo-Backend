@@ -23,6 +23,8 @@ public class PostShipmentEndPoint(IMediator mediator)
         var command = new CreateShipmentCommand
         {
             OrderDeliveryId = request.OrderDeliveryId,
+            PackageCount = request.PackageCount,
+            PackageDescription = request.PackageDescription,
             Lines = request.Lines.Select(l => new CreateShipmentLine
             {
                 OrderDeliveryDetailId = l.OrderDeliveryDetailId,
@@ -47,6 +49,8 @@ public class PostShipmentEndPoint(IMediator mediator)
 public class CreateShipmentRequest
 {
     public Guid OrderDeliveryId { get; set; }
+    public int PackageCount { get; set; }
+    public string PackageDescription { get; set; } = null!;
     public List<CreateShipmentLineRequest> Lines { get; set; } = [];
 }
 

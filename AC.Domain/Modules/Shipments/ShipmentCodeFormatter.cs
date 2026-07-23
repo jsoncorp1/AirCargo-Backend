@@ -4,7 +4,7 @@ namespace AC.Domain.Modules.Shipments;
 
 public static class ShipmentCodeFormatter
 {
-    public static string Format(OrderType orderType, DeliveryType deliveryType, int sequenceNumber)
+    public static string Format(OrderType orderType, int sequenceNumber)
     {
         var typePrefix = orderType switch
         {
@@ -13,13 +13,6 @@ public static class ShipmentCodeFormatter
             _ => throw new ArgumentOutOfRangeException(nameof(orderType))
         };
 
-        var paymentPrefix = deliveryType switch
-        {
-            DeliveryType.Prepaid => "PAG",
-            DeliveryType.CashOnDelivery => "CXC",
-            _ => throw new ArgumentOutOfRangeException(nameof(deliveryType))
-        };
-
-        return $"{typePrefix}-{paymentPrefix}-{sequenceNumber:D6}";
+        return $"{typePrefix}-{sequenceNumber:D6}";
     }
 }

@@ -23,6 +23,8 @@ public class PutShipmentEndPoint(IMediator mediator)
         var command = new UpdateShipmentCommand
         {
             Id = request.Id,
+            PackageCount = request.Body.PackageCount,
+            PackageDescription = request.Body.PackageDescription,
             Lines = request.Body.Lines.Select(l => new UpdateShipmentLine
             {
                 ShipmentDetailId = l.ShipmentDetailId,
@@ -55,6 +57,8 @@ public class PutShipmentRequest
 
 public class PutShipmentBody
 {
+    public int PackageCount { get; set; }
+    public string PackageDescription { get; set; } = null!;
     public List<PutShipmentLineBody> Lines { get; set; } = [];
 }
 

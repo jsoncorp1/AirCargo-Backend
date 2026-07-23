@@ -109,7 +109,7 @@ public class UpdateOrderDeliveryCommandHandler(
             });
         }
 
-        order.Department = command.Department;
+        order.DestinationDepartment = command.DestinationDepartment;
         order.ClientPhone = command.ClientPhone;
         order.ClientFullName = command.ClientFullName;
         order.ClientAddress = command.ClientAddress;
@@ -130,7 +130,7 @@ public class UpdateOrderDeliveryCommandHandler(
             Id = order.Id,
             SupplierId = order.SupplierId,
             UserId = order.UserId,
-            Department = order.Department,
+            DestinationDepartment = order.DestinationDepartment,
             ClientPhone = order.ClientPhone,
             ClientFullName = order.ClientFullName,
             ClientAddress = order.ClientAddress,

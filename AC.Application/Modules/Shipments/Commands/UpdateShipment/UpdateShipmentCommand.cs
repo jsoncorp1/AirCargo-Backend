@@ -5,6 +5,8 @@ namespace AC.Application.Modules.Shipments.Commands.UpdateShipment;
 public class UpdateShipmentCommand : ICommand<UpdateShipmentCommandResult>
 {
     public Guid Id { get; set; }
+    public int PackageCount { get; set; }
+    public string PackageDescription { get; set; } = string.Empty;
     public List<UpdateShipmentLine> Lines { get; set; } = [];
 }
 

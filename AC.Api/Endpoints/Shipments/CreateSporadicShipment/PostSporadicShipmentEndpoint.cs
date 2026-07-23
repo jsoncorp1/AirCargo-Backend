@@ -1,5 +1,6 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
+using AC.Application.Abstractions.Security;
 using AC.Application.Modules.Shipments.Commands.CreateSporadicShipment;
 using AC.Domain.Modules.OrderDeliveries;
 using Ardalis.ApiEndpoints;
@@ -8,7 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Shipments.CreateSporadicShipment;
 
-public class PostSporadicShipmentEndPoint(IMediator mediator)
+public class PostSporadicShipmentEndPoint(IMediator mediator, ICurrentUser currentUser)
     : EndpointBaseAsync
         .WithRequest<CreateSporadicShipmentRequest>
         .WithActionResult<CreateSporadicShipmentCommandResult>
@@ -22,12 +23,18 @@ public class PostSporadicShipmentEndPoint(IMediator mediator)
     {
         var command = new CreateSporadicShipmentCommand
         {
-            UserId = request.UserId,
-            Department = request.Department,
+            UserId = currentUser.UserId!.Value,
+            OriginDepartment = request.OriginDepartment,
+            SenderFullName = request.SenderFullName,
+            SenderPhone = request.SenderPhone,
+            SenderAddress = request.SenderAddress,
+            DestinationDepartment = request.DestinationDepartment,
             ClientPhone = request.ClientPhone,
             ClientFullName = request.ClientFullName,
             ClientAddress = request.ClientAddress,
             DeliveryType = request.DeliveryType,
+            PackageCount = request.PackageCount,
+            PackageDescription = request.PackageDescription,
             Lines = request.Lines.Select(l => new CreateSporadicShipmentLine
             {
                 ArticleName = l.ArticleName,
@@ -49,12 +56,20 @@ public class PostSporadicShipmentEndPoint(IMediator mediator)
 
 public class CreateSporadicShipmentRequest
 {
-    public Guid UserId { get; set; }
-    public BolivianDepartment Department { get; set; }
+    public BolivianDepartment OriginDepartment { get; set; }
+    public string SenderFullName { get; set; } = null!;
+    public string SenderPhone { get; set; } = null!;
+    public string SenderAddress { get; set; } = null!;
+
+    public BolivianDepartment DestinationDepartment { get; set; }
     public string ClientPhone { get; set; } = null!;
     public string ClientFullName { get; set; } = null!;
     public string ClientAddress { get; set; } = null!;
     public DeliveryType DeliveryType { get; set; }
+
+    public int PackageCount { get; set; }
+    public string PackageDescription { get; set; } = null!;
+
     public List<CreateSporadicShipmentLineRequest> Lines { get; set; } = [];
 }
 

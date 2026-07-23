@@ -1,10 +1,12 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using AC.Application;
+using AC.Application.Abstractions.Security;
 using AC.Application.Services.Security;
 using AC.Infrastructure.Persistence.EntityFramework;
 using AC.Infrastructure.Persistence.EntityFramework.Seeders;
 using AC.Infrastructure.Services.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -64,7 +66,17 @@ builder.Services
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    // Por defecto, todo endpoint requiere un JWT válido salvo que tenga
+    // [AllowAnonymous] explícito (hoy solo /auth/login).
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
 //---------------------------------------------------------------
 builder.Services.AddCustomDbContext(builder.Configuration);
 // para evitar hacer DI por cada crud----------------------------

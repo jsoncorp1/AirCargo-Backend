@@ -10,6 +10,8 @@ public class CreateSporadicShipmentCommandResult : ICommandResult
     public decimal TotalPrice { get; set; }
     public decimal TotalWeight { get; set; }
     public decimal ShippingPrice { get; set; }
+    public int PackageCount { get; set; }
+    public string PackageDescription { get; set; } = string.Empty;
     public List<CreateSporadicShipmentDetailResult> Details { get; set; } = [];
 }
 

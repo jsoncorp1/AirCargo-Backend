@@ -1,10 +1,11 @@
-﻿using AC.Domain.Common;
+﻿using AC.Application.Abstractions.Security;
+using AC.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace AC.Infrastructure.Persistence.EntityFramework;
 
-public class AuditInterceptor : SaveChangesInterceptor
+public class AuditInterceptor(ICurrentUser currentUser) : SaveChangesInterceptor
 {
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
@@ -16,7 +17,10 @@ public class AuditInterceptor : SaveChangesInterceptor
             return base.SavingChangesAsync(eventData, result, cancellationToken);
 
         DateTime now = DateTime.UtcNow;
-        const string user = "system"; // TODO: reemplazar por ICurrentUser cuando exista el JWT
+
+        // Fuera de un request HTTP autenticado (seeders, jobs) no hay
+        // ICurrentUser que resolver; "system" queda como identidad de esos casos.
+        string user = currentUser.Email ?? currentUser.UserId?.ToString() ?? "system";
 
         foreach (var entry in context.ChangeTracker.Entries<CoreEntity>())
         {

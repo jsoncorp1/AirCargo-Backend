@@ -33,6 +33,7 @@ public class GetShipmentsPaginatedQueryHandler(IRepository<Shipment> repository)
                 ClientFullName = s.OrderDelivery.ClientFullName,
                 TotalWeight = s.TotalWeight,
                 ShippingPrice = s.ShippingPrice,
+                PackageCount = s.PackageCount,
                 CreatedAt = s.CreatedAt
             })
         });

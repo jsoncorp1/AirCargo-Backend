@@ -24,6 +24,14 @@ public class CreateSporadicShipmentCommandHandler(
             return Result.Fail<CreateSporadicShipmentCommandResult>(
                 "El envío debe tener al menos una línea.", "sporadicshipment.lines.required");
 
+        if (command.PackageCount <= 0)
+            return Result.Fail<CreateSporadicShipmentCommandResult>(
+                "La cantidad de paquetes debe ser mayor a cero.", "sporadicshipment.packagecount.invalid");
+
+        if (string.IsNullOrWhiteSpace(command.PackageDescription))
+            return Result.Fail<CreateSporadicShipmentCommandResult>(
+                "La descripción de los paquetes es obligatoria.", "sporadicshipment.packagedescription.required");
+
         var user = await userRepository.GetBySpecificationAsync(
             new UserByIdSpecification(command.UserId), cancellationToken);
 
@@ -56,7 +64,11 @@ public class CreateSporadicShipmentCommandHandler(
             SupplierId = null,
             UserId = command.UserId,
             OrderType = OrderType.Sporadic,
-            Department = command.Department,
+            OriginDepartment = command.OriginDepartment,
+            SenderFullName = command.SenderFullName,
+            SenderPhone = command.SenderPhone,
+            SenderAddress = command.SenderAddress,
+            DestinationDepartment = command.DestinationDepartment,
             ClientPhone = command.ClientPhone,
             ClientFullName = command.ClientFullName,
             ClientAddress = command.ClientAddress,
@@ -76,7 +88,7 @@ public class CreateSporadicShipmentCommandHandler(
         }).ToList();
 
         int sequenceNumber = (await shipmentRepository.MaxAsync(s => s.SequenceNumber, cancellationToken) ?? 0) + 1;
-        string code = ShipmentCodeFormatter.Format(orderDelivery.OrderType, orderDelivery.DeliveryType, sequenceNumber);
+        string code = ShipmentCodeFormatter.Format(orderDelivery.OrderType, sequenceNumber);
 
         var shipment = new Shipment
         {
@@ -85,7 +97,9 @@ public class CreateSporadicShipmentCommandHandler(
             SequenceNumber = sequenceNumber,
             Code = code,
             TotalWeight = command.Lines.Sum(l => l.Weight),
-            ShippingPrice = command.Lines.Sum(l => l.ShippingCost)
+            ShippingPrice = command.Lines.Sum(l => l.ShippingCost),
+            PackageCount = command.PackageCount,
+            PackageDescription = command.PackageDescription
         };
 
         var shipmentDetails = orderDetails.Zip(command.Lines, (detail, line) => new ShipmentDetail
@@ -111,6 +125,8 @@ public class CreateSporadicShipmentCommandHandler(
             TotalPrice = orderDelivery.TotalPrice,
             TotalWeight = shipment.TotalWeight,
             ShippingPrice = shipment.ShippingPrice,
+            PackageCount = shipment.PackageCount,
+            PackageDescription = shipment.PackageDescription,
             Details = orderDetails.Zip(shipmentDetails, (od, sd) => new CreateSporadicShipmentDetailResult
             {
                 OrderDeliveryDetailId = od.Id,

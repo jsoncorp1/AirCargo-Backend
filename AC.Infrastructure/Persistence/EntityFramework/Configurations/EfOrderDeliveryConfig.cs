@@ -13,7 +13,12 @@ internal class EfOrderDeliveryConfig : IEntityTypeConfiguration<OrderDelivery>
             .HasMaxLength(20)
             .IsRequired();
 
-        builder.Property(o => o.Department)
+        builder.Property(o => o.OriginDepartment)
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .IsRequired();
+
+        builder.Property(o => o.DestinationDepartment)
             .HasConversion<string>()
             .HasMaxLength(20)
             .IsRequired();
@@ -22,6 +27,18 @@ internal class EfOrderDeliveryConfig : IEntityTypeConfiguration<OrderDelivery>
             .HasConversion<string>()
             .HasMaxLength(20)
             .IsRequired();
+
+        builder.Property(o => o.SenderFullName)
+            .IsRequired()
+            .HasMaxLength(150);
+
+        builder.Property(o => o.SenderPhone)
+            .IsRequired()
+            .HasMaxLength(30);
+
+        builder.Property(o => o.SenderAddress)
+            .IsRequired()
+            .HasMaxLength(300);
 
         builder.Property(o => o.ClientPhone)
             .IsRequired()

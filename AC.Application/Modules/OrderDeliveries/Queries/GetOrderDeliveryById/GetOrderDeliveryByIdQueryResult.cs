@@ -10,7 +10,11 @@ public class GetOrderDeliveryByIdQueryResult : IQueryResult
     public Guid UserId { get; set; }
     public string UserName { get; set; } = string.Empty;
     public string OrderType { get; set; } = string.Empty;
-    public string Department { get; set; } = string.Empty;
+    public string OriginDepartment { get; set; } = string.Empty;
+    public string SenderFullName { get; set; } = string.Empty;
+    public string SenderPhone { get; set; } = string.Empty;
+    public string SenderAddress { get; set; } = string.Empty;
+    public string DestinationDepartment { get; set; } = string.Empty;
     public string ClientPhone { get; set; } = string.Empty;
     public string ClientFullName { get; set; } = string.Empty;
     public string ClientAddress { get; set; } = string.Empty;

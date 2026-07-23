@@ -19,6 +19,10 @@ internal class EfShipmentConfig : IEntityTypeConfiguration<Shipment>
         builder.Property(s => s.ShippingPrice)
             .HasPrecision(18, 2);
 
+        builder.Property(s => s.PackageDescription)
+            .IsRequired()
+            .HasMaxLength(300);
+
         // Correlativo único solo entre envíos activos: MaxAsync (usado para generarlo)
         // también solo mira filas activas, así que un envío cancelado no debe seguir
         // "ocupando" su número frente a uno nuevo.

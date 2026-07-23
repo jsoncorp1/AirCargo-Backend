@@ -26,6 +26,14 @@ public class UpdateShipmentCommandHandler(
             return Result.Fail<UpdateShipmentCommandResult>(
                 "El envío debe tener al menos una línea.", "shipment.lines.required");
 
+        if (command.PackageCount <= 0)
+            return Result.Fail<UpdateShipmentCommandResult>(
+                "La cantidad de paquetes debe ser mayor a cero.", "shipment.packagecount.invalid");
+
+        if (string.IsNullOrWhiteSpace(command.PackageDescription))
+            return Result.Fail<UpdateShipmentCommandResult>(
+                "La descripción de los paquetes es obligatoria.", "shipment.packagedescription.required");
+
         var existingDetails = shipment.ShipmentDetails.ToDictionary(d => d.Id);
         var lineDetailIds = command.Lines.Select(l => l.ShipmentDetailId).ToHashSet();
 
@@ -54,6 +62,8 @@ public class UpdateShipmentCommandHandler(
 
         shipment.TotalWeight = shipment.ShipmentDetails.Sum(d => d.Weight);
         shipment.ShippingPrice = shipment.ShipmentDetails.Sum(d => d.ShippingCost);
+        shipment.PackageCount = command.PackageCount;
+        shipment.PackageDescription = command.PackageDescription;
 
         await shipmentDetailRepository.UpdateAsync(shipment.ShipmentDetails.ToArray(), cancellationToken);
         await shipmentRepository.UpdateAsync(shipment, cancellationToken);
@@ -67,6 +77,8 @@ public class UpdateShipmentCommandHandler(
             Code = shipment.Code,
             TotalWeight = shipment.TotalWeight,
             ShippingPrice = shipment.ShippingPrice,
+            PackageCount = shipment.PackageCount,
+            PackageDescription = shipment.PackageDescription,
             Details = shipment.ShipmentDetails.Select(d => new UpdateShipmentDetailResult
             {
                 Id = d.Id,

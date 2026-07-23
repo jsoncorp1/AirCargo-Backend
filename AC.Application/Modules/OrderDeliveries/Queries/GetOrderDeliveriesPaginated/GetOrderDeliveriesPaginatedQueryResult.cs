@@ -18,7 +18,7 @@ public class OrderDeliveryPaginatedItem
     public string? SupplierName { get; set; }
     public string OrderType { get; set; } = string.Empty;
     public string ClientFullName { get; set; } = string.Empty;
-    public string Department { get; set; } = string.Empty;
+    public string DestinationDepartment { get; set; } = string.Empty;
     public string DeliveryType { get; set; } = string.Empty;
     public decimal TotalPrice { get; set; }
     public bool IsAttended { get; set; }

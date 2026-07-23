@@ -32,6 +32,14 @@ public class CreateShipmentCommandHandler(
             return Result.Fail<CreateShipmentCommandResult>(
                 "El envío debe tener al menos una línea.", "shipment.lines.required");
 
+        if (command.PackageCount <= 0)
+            return Result.Fail<CreateShipmentCommandResult>(
+                "La cantidad de paquetes debe ser mayor a cero.", "shipment.packagecount.invalid");
+
+        if (string.IsNullOrWhiteSpace(command.PackageDescription))
+            return Result.Fail<CreateShipmentCommandResult>(
+                "La descripción de los paquetes es obligatoria.", "shipment.packagedescription.required");
+
         var orderDetailIds = order.OrderDeliveryDetails.Select(d => d.Id).ToHashSet();
         var lineDetailIds = command.Lines.Select(l => l.OrderDeliveryDetailId).ToHashSet();
 
@@ -52,7 +60,7 @@ public class CreateShipmentCommandHandler(
         }
 
         int sequenceNumber = (await shipmentRepository.MaxAsync(s => s.SequenceNumber, cancellationToken) ?? 0) + 1;
-        string code = ShipmentCodeFormatter.Format(order.OrderType, order.DeliveryType, sequenceNumber);
+        string code = ShipmentCodeFormatter.Format(order.OrderType, sequenceNumber);
 
         var shipment = new Shipment
         {
@@ -61,7 +69,9 @@ public class CreateShipmentCommandHandler(
             SequenceNumber = sequenceNumber,
             Code = code,
             TotalWeight = command.Lines.Sum(l => l.Weight),
-            ShippingPrice = command.Lines.Sum(l => l.ShippingCost)
+            ShippingPrice = command.Lines.Sum(l => l.ShippingCost),
+            PackageCount = command.PackageCount,
+            PackageDescription = command.PackageDescription
         };
 
         var details = command.Lines.Select(l => new ShipmentDetail
@@ -85,6 +95,8 @@ public class CreateShipmentCommandHandler(
             Code = shipment.Code,
             TotalWeight = shipment.TotalWeight,
             ShippingPrice = shipment.ShippingPrice,
+            PackageCount = shipment.PackageCount,
+            PackageDescription = shipment.PackageDescription,
             Details = details.Select(d => new CreateShipmentDetailResult
             {
                 Id = d.Id,
