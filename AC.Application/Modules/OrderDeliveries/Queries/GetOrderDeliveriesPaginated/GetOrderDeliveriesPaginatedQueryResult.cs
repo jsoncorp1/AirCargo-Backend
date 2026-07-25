@@ -20,6 +20,7 @@ public class OrderDeliveryPaginatedItem
     public string ClientFullName { get; set; } = string.Empty;
     public string DestinationDepartment { get; set; } = string.Empty;
     public string DeliveryType { get; set; } = string.Empty;
+    public bool IsExpress { get; set; }
     public decimal TotalPrice { get; set; }
     public bool IsAttended { get; set; }
     public DateTime CreatedAt { get; set; }

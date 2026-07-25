@@ -29,6 +29,7 @@ public class PutOrderDeliveryEndPoint(IMediator mediator)
             ClientFullName = request.Body.ClientFullName,
             ClientAddress = request.Body.ClientAddress,
             DeliveryType = request.Body.DeliveryType,
+            IsExpress = request.Body.IsExpress,
             Lines = request.Body.Lines.Select(l => new UpdateOrderDeliveryLine
             {
                 ArticleId = l.ArticleId,
@@ -66,6 +67,7 @@ public class PutOrderDeliveryBody
     public string ClientFullName { get; set; } = null!;
     public string ClientAddress { get; set; } = null!;
     public DeliveryType DeliveryType { get; set; }
+    public bool IsExpress { get; set; }
     public List<PutOrderDeliveryLineBody> Lines { get; set; } = [];
 }
 

@@ -11,6 +11,7 @@ public class UpdateOrderDeliveryCommand : ICommand<UpdateOrderDeliveryCommandRes
     public string ClientFullName { get; set; } = string.Empty;
     public string ClientAddress { get; set; } = string.Empty;
     public DeliveryType DeliveryType { get; set; }
+    public bool IsExpress { get; set; }
     public List<UpdateOrderDeliveryLine> Lines { get; set; } = [];
 }
 

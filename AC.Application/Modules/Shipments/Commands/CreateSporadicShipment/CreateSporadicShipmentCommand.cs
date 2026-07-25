@@ -17,6 +17,7 @@ public class CreateSporadicShipmentCommand : ICommand<CreateSporadicShipmentComm
     public string ClientFullName { get; set; } = string.Empty;
     public string ClientAddress { get; set; } = string.Empty;
     public DeliveryType DeliveryType { get; set; }
+    public bool IsExpress { get; set; }
 
     public int PackageCount { get; set; }
     public string PackageDescription { get; set; } = string.Empty;

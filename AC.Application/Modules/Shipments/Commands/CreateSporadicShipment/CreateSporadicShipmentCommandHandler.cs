@@ -73,6 +73,7 @@ public class CreateSporadicShipmentCommandHandler(
             ClientFullName = command.ClientFullName,
             ClientAddress = command.ClientAddress,
             DeliveryType = command.DeliveryType,
+            IsExpress = command.IsExpress,
             TotalPrice = command.Lines.Sum(l => l.Quantity * l.UnitPrice)
         };
 
@@ -122,6 +123,7 @@ public class CreateSporadicShipmentCommandHandler(
             OrderDeliveryId = orderDelivery.Id,
             ShipmentId = shipment.Id,
             Code = shipment.Code,
+            IsExpress = orderDelivery.IsExpress,
             TotalPrice = orderDelivery.TotalPrice,
             TotalWeight = shipment.TotalWeight,
             ShippingPrice = shipment.ShippingPrice,

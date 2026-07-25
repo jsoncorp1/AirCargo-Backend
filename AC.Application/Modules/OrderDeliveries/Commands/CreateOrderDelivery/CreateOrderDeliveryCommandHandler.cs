@@ -97,6 +97,7 @@ public class CreateOrderDeliveryCommandHandler(
             ClientFullName = command.ClientFullName,
             ClientAddress = command.ClientAddress,
             DeliveryType = command.DeliveryType,
+            IsExpress = command.IsExpress,
             TotalPrice = totalPrice
         };
 
@@ -121,6 +122,7 @@ public class CreateOrderDeliveryCommandHandler(
             ClientFullName = orderDelivery.ClientFullName,
             ClientAddress = orderDelivery.ClientAddress,
             DeliveryType = orderDelivery.DeliveryType,
+            IsExpress = orderDelivery.IsExpress,
             TotalPrice = orderDelivery.TotalPrice,
             Details = details.Select(d => new CreateOrderDeliveryDetailResult
             {

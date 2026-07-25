@@ -36,6 +36,7 @@ public class GetOrderDeliveryByIdQueryHandler(IRepository<OrderDelivery> reposit
             ClientFullName = order.ClientFullName,
             ClientAddress = order.ClientAddress,
             DeliveryType = order.DeliveryType.ToString(),
+            IsExpress = order.IsExpress,
             TotalPrice = order.TotalPrice,
             IsAttended = order.Shipments.Any(s => s.Active),
             CreatedAt = order.CreatedAt,

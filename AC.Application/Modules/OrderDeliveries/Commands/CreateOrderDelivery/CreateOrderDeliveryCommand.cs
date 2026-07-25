@@ -11,6 +11,7 @@ public class CreateOrderDeliveryCommand : ICommand<CreateOrderDeliveryCommandRes
     public string ClientFullName { get; set; } = string.Empty;
     public string ClientAddress { get; set; } = string.Empty;
     public DeliveryType DeliveryType { get; set; }
+    public bool IsExpress { get; set; }
     public List<CreateOrderDeliveryLine> Lines { get; set; } = [];
 }
 

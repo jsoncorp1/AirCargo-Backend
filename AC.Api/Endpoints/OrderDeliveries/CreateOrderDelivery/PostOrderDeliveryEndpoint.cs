@@ -29,6 +29,7 @@ public class PostOrderDeliveryEndPoint(IMediator mediator, ICurrentUser currentU
             ClientFullName = request.ClientFullName,
             ClientAddress = request.ClientAddress,
             DeliveryType = request.DeliveryType,
+            IsExpress = request.IsExpress,
             Lines = request.Lines.Select(l => new CreateOrderDeliveryLine
             {
                 ArticleId = l.ArticleId,
@@ -53,6 +54,7 @@ public class CreateOrderDeliveryRequest
     public string ClientFullName { get; set; } = null!;
     public string ClientAddress { get; set; } = null!;
     public DeliveryType DeliveryType { get; set; }
+    public bool IsExpress { get; set; }
     public List<CreateOrderDeliveryLineRequest> Lines { get; set; } = [];
 }
 

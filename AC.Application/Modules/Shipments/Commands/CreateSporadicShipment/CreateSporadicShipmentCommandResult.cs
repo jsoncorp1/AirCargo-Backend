@@ -7,6 +7,7 @@ public class CreateSporadicShipmentCommandResult : ICommandResult
     public Guid OrderDeliveryId { get; set; }
     public Guid ShipmentId { get; set; }
     public string Code { get; set; } = string.Empty;
+    public bool IsExpress { get; set; }
     public decimal TotalPrice { get; set; }
     public decimal TotalWeight { get; set; }
     public decimal ShippingPrice { get; set; }

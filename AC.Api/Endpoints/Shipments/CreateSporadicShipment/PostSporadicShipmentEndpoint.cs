@@ -33,6 +33,7 @@ public class PostSporadicShipmentEndPoint(IMediator mediator, ICurrentUser curre
             ClientFullName = request.ClientFullName,
             ClientAddress = request.ClientAddress,
             DeliveryType = request.DeliveryType,
+            IsExpress = request.IsExpress,
             PackageCount = request.PackageCount,
             PackageDescription = request.PackageDescription,
             Lines = request.Lines.Select(l => new CreateSporadicShipmentLine
@@ -66,6 +67,7 @@ public class CreateSporadicShipmentRequest
     public string ClientFullName { get; set; } = null!;
     public string ClientAddress { get; set; } = null!;
     public DeliveryType DeliveryType { get; set; }
+    public bool IsExpress { get; set; }
 
     public int PackageCount { get; set; }
     public string PackageDescription { get; set; } = null!;

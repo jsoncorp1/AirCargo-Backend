@@ -16,6 +16,7 @@ public class CreateOrderDeliveryCommandResult : ICommandResult
     public string ClientFullName { get; set; } = string.Empty;
     public string ClientAddress { get; set; } = string.Empty;
     public DeliveryType DeliveryType { get; set; }
+    public bool IsExpress { get; set; }
     public decimal TotalPrice { get; set; }
     public List<CreateOrderDeliveryDetailResult> Details { get; set; } = [];
 }

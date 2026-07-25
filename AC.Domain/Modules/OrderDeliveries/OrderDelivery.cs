@@ -31,6 +31,9 @@ public class OrderDelivery : CoreEntity
     public string ClientAddress { get; set; } = string.Empty;
     public DeliveryType DeliveryType { get; set; }
 
+    // Tipo de envío: true = expreso, false = normal.
+    public bool IsExpress { get; set; }
+
     public decimal TotalPrice { get; set; }
 
     public ICollection<OrderDeliveryDetail> OrderDeliveryDetails { get; set; } = new List<OrderDeliveryDetail>();
