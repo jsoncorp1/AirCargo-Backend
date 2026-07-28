@@ -13,4 +13,7 @@ public class GetUserByIdQueryResult : IQueryResult
     public string RoleName { get; set; } = string.Empty;
     public Guid? SupplierId { get; set; }
     public string? SupplierName { get; set; }
+    public Guid? BranchOfficeId { get; set; }
+    public string? BranchOfficeCode { get; set; }
+    public string? BranchOfficeCity { get; set; }
 }

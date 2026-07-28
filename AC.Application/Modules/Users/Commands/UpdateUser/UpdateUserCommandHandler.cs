@@ -1,7 +1,9 @@
 using AC.Application.Abstractions.Messaging.Commands;
+using AC.Application.Modules.BranchOffices.Specifications;
 using AC.Application.Modules.Roles.Specifications;
 using AC.Application.Modules.Suppliers.Specifications;
 using AC.Application.Modules.Users.Specifications;
+using AC.Domain.Modules.BranchOffices;
 using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Suppliers;
 using AC.Domain.Modules.Users;
@@ -14,6 +16,7 @@ public class UpdateUserCommandHandler(
     IRepository<User> userRepository,
     IRepository<Role> roleRepository,
     IRepository<Supplier> supplierRepository,
+    IRepository<BranchOffice> branchOfficeRepository,
     ICoreUnitOfWork unitOfWork)
     : ICommandHandler<UpdateUserCommand, UpdateUserCommandResult>
 {
@@ -51,6 +54,16 @@ public class UpdateUserCommandHandler(
                     "El proveedor indicado no existe.", "user.supplier.notfound");
         }
 
+        if (command.BranchOfficeId is not null)
+        {
+            var branchOffice = await branchOfficeRepository.GetBySpecificationAsync(
+                new BranchOfficeByIdSpecification(command.BranchOfficeId.Value), cancellationToken);
+
+            if (branchOffice is null)
+                return Result.Fail<UpdateUserCommandResult>(
+                    "La sucursal indicada no existe.", "user.branchoffice.notfound");
+        }
+
         var previousSupplier = user.Supplier;
 
         user.FullName = command.FullName;
@@ -60,6 +73,7 @@ public class UpdateUserCommandHandler(
         user.RoleId = command.RoleId;
         user.SupplierId = command.SupplierId;
         user.Supplier = newSupplier;
+        user.BranchOfficeId = command.BranchOfficeId;
 
         await userRepository.UpdateAsync(user, cancellationToken);
 
@@ -88,7 +102,8 @@ public class UpdateUserCommandHandler(
             PhoneNumber = user.PhoneNumber,
             Dni = user.Dni,
             RoleId = user.RoleId,
-            SupplierId = user.SupplierId
+            SupplierId = user.SupplierId,
+            BranchOfficeId = user.BranchOfficeId
         });
     }
 }

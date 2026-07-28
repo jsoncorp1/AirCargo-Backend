@@ -1,4 +1,5 @@
 ﻿using AC.Domain.Common;
+using AC.Domain.Modules.BranchOffices;
 using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Suppliers;
 
@@ -17,4 +18,9 @@ public class User : CoreEntity
     
     public Guid? SupplierId { get; set; }
     public Supplier? Supplier { get; set; }
+
+    // Sucursal a la que pertenece el usuario (admins/mostrador). Nullable porque
+    // los usuarios de proveedores no pertenecen a ninguna sucursal.
+    public Guid? BranchOfficeId { get; set; }
+    public BranchOffice? BranchOffice { get; set; }
 }

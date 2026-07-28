@@ -1,5 +1,6 @@
 ﻿using AC.Domain.Modules.Articles;
 using AC.Domain.Modules.ArticleReceipts;
+using AC.Domain.Modules.BranchOffices;
 using AC.Domain.Modules.OrderDeliveries;
 using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Shipments;
@@ -19,6 +20,7 @@ public class CoreDbContext(DbContextOptions<CoreDbContext> options) : DbContext(
     public DbSet<OrderDelivery> OrderDeliveries { get; set; }
     public DbSet<OrderDeliveryDetail> OrderDeliveryDetails { get; set; }
     public DbSet<Shipment> Shipments { get; set; }
+    public DbSet<BranchOffice> BranchOffices { get; set; }
     public DbSet<ShipmentDetail> ShipmentDetails { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

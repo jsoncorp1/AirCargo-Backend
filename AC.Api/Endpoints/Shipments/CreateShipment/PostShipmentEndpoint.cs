@@ -1,5 +1,6 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
+using AC.Application.Abstractions.Security;
 using AC.Application.Modules.Shipments.Commands.CreateShipment;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Shipments.CreateShipment;
 
-public class PostShipmentEndPoint(IMediator mediator)
+public class PostShipmentEndPoint(IMediator mediator, ICurrentUser currentUser)
     : EndpointBaseAsync
         .WithRequest<CreateShipmentRequest>
         .WithActionResult<CreateShipmentCommandResult>
@@ -23,6 +24,8 @@ public class PostShipmentEndPoint(IMediator mediator)
         var command = new CreateShipmentCommand
         {
             OrderDeliveryId = request.OrderDeliveryId,
+            UserId = currentUser.UserId!.Value,
+            DestinationBranchOfficeId = request.DestinationBranchOfficeId,
             PackageCount = request.PackageCount,
             PackageDescription = request.PackageDescription,
             Lines = request.Lines.Select(l => new CreateShipmentLine
@@ -49,6 +52,10 @@ public class PostShipmentEndPoint(IMediator mediator)
 public class CreateShipmentRequest
 {
     public Guid OrderDeliveryId { get; set; }
+
+    // El origen no se manda: se toma de la sucursal del usuario autenticado.
+    public Guid DestinationBranchOfficeId { get; set; }
+
     public int PackageCount { get; set; }
     public string PackageDescription { get; set; } = null!;
     public List<CreateShipmentLineRequest> Lines { get; set; } = [];

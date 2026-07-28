@@ -26,6 +26,8 @@ public class HttpContextCurrentUser(IHttpContextAccessor httpContextAccessor) : 
 
     public Guid? SupplierId => ParseGuid(Principal?.FindFirst("supplierId")?.Value);
 
+    public Guid? BranchOfficeId => ParseGuid(Principal?.FindFirst("branchOfficeId")?.Value);
+
     private static Guid? ParseGuid(string? value) =>
         Guid.TryParse(value, out var id) ? id : null;
 }

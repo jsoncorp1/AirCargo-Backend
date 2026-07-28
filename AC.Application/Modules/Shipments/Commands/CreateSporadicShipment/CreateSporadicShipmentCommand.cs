@@ -5,7 +5,9 @@ namespace AC.Application.Modules.Shipments.Commands.CreateSporadicShipment;
 
 public class CreateSporadicShipmentCommand : ICommand<CreateSporadicShipmentCommandResult>
 {
+    // Usuario autenticado que registra el envío; su sucursal es el origen.
     public Guid UserId { get; set; }
+    public Guid DestinationBranchOfficeId { get; set; }
 
     public BolivianDepartment OriginDepartment { get; set; }
     public string SenderFullName { get; set; } = string.Empty;

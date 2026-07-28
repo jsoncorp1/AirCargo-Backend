@@ -1,4 +1,5 @@
 using AC.Application.Abstractions.Messaging.Queries;
+using AC.Domain.Modules.Shipments;
 
 namespace AC.Application.Modules.Shipments.Queries.GetShipmentById;
 
@@ -15,6 +16,15 @@ public class GetShipmentByIdQueryResult : IQueryResult
     public string ClientFullName { get; set; } = string.Empty;
     public string ClientAddress { get; set; } = string.Empty;
     public string DestinationDepartment { get; set; } = string.Empty;
+    public Guid? OriginBranchOfficeId { get; set; }
+    public string? OriginBranchOfficeCode { get; set; }
+    public string? OriginBranchOfficeCity { get; set; }
+    public Guid? DestinationBranchOfficeId { get; set; }
+    public string? DestinationBranchOfficeCode { get; set; }
+    public string? DestinationBranchOfficeCity { get; set; }
+    public ShipmentStatus Status { get; set; }
+    public ShipmentObservation? Observation { get; set; }
+    public string? DeliveryComment { get; set; }
     public decimal TotalWeight { get; set; }
     public decimal ShippingPrice { get; set; }
     public int PackageCount { get; set; }

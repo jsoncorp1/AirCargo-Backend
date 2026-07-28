@@ -12,6 +12,7 @@ public sealed class UserPaginationSpecification : PaginationSpecification<User>
         Query
             .Include(u => u.Role)
             .Include(u => u.Supplier)
+            .Include(u => u.BranchOffice)
             .OrderBy(u => u.FullName);
 
         if (roleId is not null)

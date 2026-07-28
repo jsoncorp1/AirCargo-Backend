@@ -24,6 +24,7 @@ public class PostSporadicShipmentEndPoint(IMediator mediator, ICurrentUser curre
         var command = new CreateSporadicShipmentCommand
         {
             UserId = currentUser.UserId!.Value,
+            DestinationBranchOfficeId = request.DestinationBranchOfficeId,
             OriginDepartment = request.OriginDepartment,
             SenderFullName = request.SenderFullName,
             SenderPhone = request.SenderPhone,
@@ -57,6 +58,9 @@ public class PostSporadicShipmentEndPoint(IMediator mediator, ICurrentUser curre
 
 public class CreateSporadicShipmentRequest
 {
+    // El origen no se manda: se toma de la sucursal del usuario autenticado.
+    public Guid DestinationBranchOfficeId { get; set; }
+
     public BolivianDepartment OriginDepartment { get; set; }
     public string SenderFullName { get; set; } = null!;
     public string SenderPhone { get; set; } = null!;

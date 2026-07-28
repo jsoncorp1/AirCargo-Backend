@@ -10,6 +10,7 @@ public sealed class UserByIdSpecification : Specification<User>
         Query
             .Where(u => u.Id == id)
             .Include(u => u.Role)
-            .Include(u => u.Supplier);
+            .Include(u => u.Supplier)
+            .Include(u => u.BranchOffice);
     }
 }

@@ -1,4 +1,5 @@
 using AC.Application.Abstractions.Messaging.Commands;
+using AC.Domain.Modules.Shipments;
 
 namespace AC.Application.Modules.Shipments.Commands.CreateShipment;
 
@@ -6,6 +7,9 @@ public class CreateShipmentCommandResult : ICommandResult
 {
     public Guid Id { get; set; }
     public Guid OrderDeliveryId { get; set; }
+    public Guid? OriginBranchOfficeId { get; set; }
+    public Guid? DestinationBranchOfficeId { get; set; }
+    public ShipmentStatus Status { get; set; }
     public string WaybillNumber { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
     public decimal TotalWeight { get; set; }

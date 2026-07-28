@@ -1,7 +1,11 @@
 using AC.Application.Abstractions.Messaging.Commands;
+using AC.Application.Modules.BranchOffices.Specifications;
 using AC.Application.Modules.OrderDeliveries.Specifications;
+using AC.Application.Modules.Users.Specifications;
+using AC.Domain.Modules.BranchOffices;
 using AC.Domain.Modules.OrderDeliveries;
 using AC.Domain.Modules.Shipments;
+using AC.Domain.Modules.Users;
 using AC.Domain.Persistence;
 using AC.Domain.Results;
 
@@ -11,6 +15,8 @@ public class CreateShipmentCommandHandler(
     IRepository<OrderDelivery> orderDeliveryRepository,
     IRepository<Shipment> shipmentRepository,
     IRepository<ShipmentDetail> shipmentDetailRepository,
+    IRepository<User> userRepository,
+    IRepository<BranchOffice> branchOfficeRepository,
     ICoreUnitOfWork unitOfWork)
     : ICommandHandler<CreateShipmentCommand, CreateShipmentCommandResult>
 {
@@ -40,6 +46,25 @@ public class CreateShipmentCommandHandler(
             return Result.Fail<CreateShipmentCommandResult>(
                 "La descripción de los paquetes es obligatoria.", "shipment.packagedescription.required");
 
+        // El origen del envío es la sucursal del usuario que atiende la orden.
+        var attendingUser = await userRepository.GetBySpecificationAsync(
+            new UserByIdSpecification(command.UserId), cancellationToken);
+
+        if (attendingUser is null)
+            return Result.Fail<CreateShipmentCommandResult>(
+                "El usuario que atiende no existe.", "shipment.user.notfound");
+
+        if (attendingUser.BranchOfficeId is null)
+            return Result.Fail<CreateShipmentCommandResult>(
+                "El usuario que atiende no tiene una sucursal asignada.", "shipment.originbranch.missing");
+
+        var destinationBranch = await branchOfficeRepository.GetBySpecificationAsync(
+            new BranchOfficeByIdSpecification(command.DestinationBranchOfficeId), cancellationToken);
+
+        if (destinationBranch is null)
+            return Result.Fail<CreateShipmentCommandResult>(
+                "La sucursal de destino no existe.", "shipment.destinationbranch.notfound");
+
         var orderDetailIds = order.OrderDeliveryDetails.Select(d => d.Id).ToHashSet();
         var lineDetailIds = command.Lines.Select(l => l.OrderDeliveryDetailId).ToHashSet();
 
@@ -66,6 +91,9 @@ public class CreateShipmentCommandHandler(
         {
             Id = Guid.NewGuid(),
             OrderDeliveryId = order.Id,
+            OriginBranchOfficeId = attendingUser.BranchOfficeId,
+            DestinationBranchOfficeId = destinationBranch.Id,
+            Status = ShipmentStatus.InTransit,
             SequenceNumber = sequenceNumber,
             Code = code,
             TotalWeight = command.Lines.Sum(l => l.Weight),
@@ -91,6 +119,9 @@ public class CreateShipmentCommandHandler(
         {
             Id = shipment.Id,
             OrderDeliveryId = shipment.OrderDeliveryId,
+            OriginBranchOfficeId = shipment.OriginBranchOfficeId,
+            DestinationBranchOfficeId = shipment.DestinationBranchOfficeId,
+            Status = shipment.Status,
             WaybillNumber = shipment.SequenceNumber.ToString("D8"),
             Code = shipment.Code,
             TotalWeight = shipment.TotalWeight,

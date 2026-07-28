@@ -1,6 +1,7 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Modules.Shipments.Queries.GetShipmentsPaginated;
+using AC.Domain.Modules.Shipments;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -24,7 +25,10 @@ public class GetShipmentsPaginatedEndPoint(IMediator mediator)
             {
                 Page = request.Page,
                 PerPage = request.PerPage,
-                SupplierId = request.SupplierId
+                SupplierId = request.SupplierId,
+                OriginBranchOfficeId = request.OriginBranchOfficeId,
+                DestinationBranchOfficeId = request.DestinationBranchOfficeId,
+                Status = request.Status
             },
             cancellationToken);
 
@@ -37,4 +41,7 @@ public class GetShipmentsPaginatedRequest
     public int Page { get; set; } = 1;
     public int PerPage { get; set; } = 10;
     public Guid? SupplierId { get; set; }
+    public Guid? OriginBranchOfficeId { get; set; }
+    public Guid? DestinationBranchOfficeId { get; set; }
+    public ShipmentStatus? Status { get; set; }
 }

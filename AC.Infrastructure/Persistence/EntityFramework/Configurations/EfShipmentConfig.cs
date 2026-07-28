@@ -23,6 +23,30 @@ internal class EfShipmentConfig : IEntityTypeConfiguration<Shipment>
             .IsRequired()
             .HasMaxLength(300);
 
+        builder.Property(s => s.Status)
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .IsRequired();
+
+        builder.Property(s => s.Observation)
+            .HasConversion<string>()
+            .HasMaxLength(30);
+
+        builder.Property(s => s.DeliveryComment)
+            .HasMaxLength(500);
+
+        // FKs nullable solo por los envíos anteriores al modelo multisucursal;
+        // los handlers exigen ambas sucursales para todo envío nuevo.
+        builder.HasOne(s => s.OriginBranchOffice)
+            .WithMany(b => b.OriginShipments)
+            .HasForeignKey(s => s.OriginBranchOfficeId)
+            .IsRequired(false);
+
+        builder.HasOne(s => s.DestinationBranchOffice)
+            .WithMany(b => b.DestinationShipments)
+            .HasForeignKey(s => s.DestinationBranchOfficeId)
+            .IsRequired(false);
+
         // Correlativo único solo entre envíos activos: MaxAsync (usado para generarlo)
         // también solo mira filas activas, así que un envío cancelado no debe seguir
         // "ocupando" su número frente a uno nuevo.

@@ -15,7 +15,12 @@ public class GetShipmentsPaginatedQueryHandler(IRepository<Shipment> repository)
         int page = query.Page < 1 ? 1 : query.Page;
         int perPage = query.PerPage is < 1 or > 100 ? 10 : query.PerPage;
 
-        var spec = new ShipmentPaginationSpecification(page, perPage, query.SupplierId);
+        var spec = new ShipmentPaginationSpecification(
+            page, perPage,
+            query.SupplierId,
+            query.OriginBranchOfficeId,
+            query.DestinationBranchOfficeId,
+            query.Status);
         var result = await repository.GetPaginatedAsync(spec, cancellationToken);
 
         return Result.Success(new GetShipmentsPaginatedQueryResult
@@ -31,6 +36,13 @@ public class GetShipmentsPaginatedQueryHandler(IRepository<Shipment> repository)
                 WaybillNumber = s.SequenceNumber.ToString("D8"),
                 Code = s.Code,
                 ClientFullName = s.OrderDelivery.ClientFullName,
+                SupplierId = s.OrderDelivery.SupplierId,
+                OriginBranchOfficeId = s.OriginBranchOfficeId,
+                OriginBranchOfficeCode = s.OriginBranchOffice != null ? s.OriginBranchOffice.Code : null,
+                DestinationBranchOfficeId = s.DestinationBranchOfficeId,
+                DestinationBranchOfficeCode = s.DestinationBranchOffice != null ? s.DestinationBranchOffice.Code : null,
+                Status = s.Status,
+                Observation = s.Observation,
                 TotalWeight = s.TotalWeight,
                 ShippingPrice = s.ShippingPrice,
                 PackageCount = s.PackageCount,

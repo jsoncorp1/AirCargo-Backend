@@ -34,6 +34,9 @@ public class LoginCommandHandler(
             Role = user.Role.Name,
             SupplierId = user.SupplierId,
             SupplierName = user.Supplier?.Name,
+            BranchOfficeId = user.BranchOfficeId,
+            BranchOfficeCode = user.BranchOffice?.Code,
+            BranchOfficeCity = user.BranchOffice?.City,
             Token = token
         });
     }

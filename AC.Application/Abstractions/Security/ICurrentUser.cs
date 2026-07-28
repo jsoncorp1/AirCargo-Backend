@@ -7,4 +7,5 @@ public interface ICurrentUser
     string? Email { get; }
     string? Role { get; }
     Guid? SupplierId { get; }
+    Guid? BranchOfficeId { get; }
 }

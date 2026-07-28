@@ -1,8 +1,10 @@
 ﻿using AC.Application.Abstractions.Messaging.Commands;
+using AC.Application.Modules.BranchOffices.Specifications;
 using AC.Application.Modules.Roles.Specifications;
 using AC.Application.Modules.Suppliers.Specifications;
 using AC.Application.Modules.Users.Specifications;
 using AC.Application.Services.Security;
+using AC.Domain.Modules.BranchOffices;
 using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Suppliers;
 using AC.Domain.Modules.Users;
@@ -15,6 +17,7 @@ public class CreateUserCommandHandler(
     IRepository<User> userRepository,
     IRepository<Role> roleRepository,
     IRepository<Supplier> supplierRepository,
+    IRepository<BranchOffice> branchOfficeRepository,
     IPasswordHasher passwordHasher,
     ICoreUnitOfWork unitOfWork)
     : ICommandHandler<CreateUserCommand, CreateUserCommandResult>
@@ -40,7 +43,8 @@ public class CreateUserCommandHandler(
             PhoneNumber = command.PhoneNumber,
             Dni = command.Dni,
             RoleId = command.RoleId,
-            SupplierId = command.SupplierId
+            SupplierId = command.SupplierId,
+            BranchOfficeId = command.BranchOfficeId
         };
 
         await userRepository.SaveAsync(user, cancellationToken);
@@ -61,7 +65,8 @@ public class CreateUserCommandHandler(
             PhoneNumber = user.PhoneNumber,
             Dni = user.Dni,
             RoleId = user.RoleId,
-            SupplierId = user.SupplierId
+            SupplierId = user.SupplierId,
+            BranchOfficeId = user.BranchOfficeId
         });
     }
 
@@ -99,6 +104,15 @@ public class CreateUserCommandHandler(
 
             if (supplier is null)
                 return Result.Fail("El proveedor indicado no existe.", "user.supplier.notfound");
+        }
+
+        if (command.BranchOfficeId is not null)
+        {
+            var branchOffice = await branchOfficeRepository.GetBySpecificationAsync(
+                new BranchOfficeByIdSpecification(command.BranchOfficeId.Value), cancellationToken);
+
+            if (branchOffice is null)
+                return Result.Fail("La sucursal indicada no existe.", "user.branchoffice.notfound");
         }
 
         return Result.Success();

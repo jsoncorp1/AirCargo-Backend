@@ -1,5 +1,7 @@
 using AC.Application.Abstractions.Messaging.Commands;
+using AC.Application.Modules.BranchOffices.Specifications;
 using AC.Application.Modules.Users.Specifications;
+using AC.Domain.Modules.BranchOffices;
 using AC.Domain.Modules.OrderDeliveries;
 using AC.Domain.Modules.Shipments;
 using AC.Domain.Modules.Users;
@@ -14,6 +16,7 @@ public class CreateSporadicShipmentCommandHandler(
     IRepository<OrderDeliveryDetail> orderDeliveryDetailRepository,
     IRepository<Shipment> shipmentRepository,
     IRepository<ShipmentDetail> shipmentDetailRepository,
+    IRepository<BranchOffice> branchOfficeRepository,
     ICoreUnitOfWork unitOfWork)
     : ICommandHandler<CreateSporadicShipmentCommand, CreateSporadicShipmentCommandResult>
 {
@@ -38,6 +41,18 @@ public class CreateSporadicShipmentCommandHandler(
         if (user is null)
             return Result.Fail<CreateSporadicShipmentCommandResult>(
                 "El usuario indicado no existe.", "sporadicshipment.user.notfound");
+
+        // El origen del envío es la sucursal del usuario que lo registra.
+        if (user.BranchOfficeId is null)
+            return Result.Fail<CreateSporadicShipmentCommandResult>(
+                "El usuario que atiende no tiene una sucursal asignada.", "sporadicshipment.originbranch.missing");
+
+        var destinationBranch = await branchOfficeRepository.GetBySpecificationAsync(
+            new BranchOfficeByIdSpecification(command.DestinationBranchOfficeId), cancellationToken);
+
+        if (destinationBranch is null)
+            return Result.Fail<CreateSporadicShipmentCommandResult>(
+                "La sucursal de destino no existe.", "sporadicshipment.destinationbranch.notfound");
 
         foreach (var line in command.Lines)
         {
@@ -95,6 +110,9 @@ public class CreateSporadicShipmentCommandHandler(
         {
             Id = Guid.NewGuid(),
             OrderDeliveryId = orderDelivery.Id,
+            OriginBranchOfficeId = user.BranchOfficeId,
+            DestinationBranchOfficeId = destinationBranch.Id,
+            Status = ShipmentStatus.InTransit,
             SequenceNumber = sequenceNumber,
             Code = code,
             TotalWeight = command.Lines.Sum(l => l.Weight),
@@ -122,6 +140,9 @@ public class CreateSporadicShipmentCommandHandler(
         {
             OrderDeliveryId = orderDelivery.Id,
             ShipmentId = shipment.Id,
+            OriginBranchOfficeId = shipment.OriginBranchOfficeId,
+            DestinationBranchOfficeId = shipment.DestinationBranchOfficeId,
+            Status = shipment.Status,
             Code = shipment.Code,
             IsExpress = orderDelivery.IsExpress,
             TotalPrice = orderDelivery.TotalPrice,

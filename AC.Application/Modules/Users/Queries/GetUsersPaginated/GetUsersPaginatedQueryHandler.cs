@@ -34,7 +34,10 @@ public class GetUsersPaginatedQueryHandler(IRepository<User> repository)
                 RoleId = u.RoleId,
                 RoleName = u.Role.Name,
                 SupplierId = u.SupplierId,
-                SupplierName = u.Supplier != null ? u.Supplier.Name : null
+                SupplierName = u.Supplier != null ? u.Supplier.Name : null,
+                BranchOfficeId = u.BranchOfficeId,
+                BranchOfficeCode = u.BranchOffice != null ? u.BranchOffice.Code : null,
+                BranchOfficeCity = u.BranchOffice != null ? u.BranchOffice.City : null
             })
         });
     }

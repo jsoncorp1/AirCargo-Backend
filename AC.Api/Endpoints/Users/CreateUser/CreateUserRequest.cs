@@ -9,4 +9,5 @@ public class CreateUserRequest
     public string? Dni { get; set; }
     public Guid RoleId { get; set; }
     public Guid? SupplierId { get; set; }
+    public Guid? BranchOfficeId { get; set; }
 }

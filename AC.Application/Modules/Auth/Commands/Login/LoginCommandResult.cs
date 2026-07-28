@@ -11,5 +11,8 @@ public class LoginCommandResult : ICommandResult
     public string Role { get; set; } = string.Empty;
     public Guid? SupplierId { get; set; }
     public string? SupplierName { get; set; }
+    public Guid? BranchOfficeId { get; set; }
+    public string? BranchOfficeCode { get; set; }
+    public string? BranchOfficeCity { get; set; }
     public string Token { get; set; } = string.Empty;
 }

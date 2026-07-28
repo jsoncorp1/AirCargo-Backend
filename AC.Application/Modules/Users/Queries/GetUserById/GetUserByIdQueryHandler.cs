@@ -30,7 +30,10 @@ public class GetUserByIdQueryHandler(
             RoleId = user.RoleId,
             RoleName = user.Role.Name,
             SupplierId = user.SupplierId,
-            SupplierName = user.Supplier?.Name
+            SupplierName = user.Supplier?.Name,
+            BranchOfficeId = user.BranchOfficeId,
+            BranchOfficeCode = user.BranchOffice?.Code,
+            BranchOfficeCity = user.BranchOffice?.City
         });
     }
 }

@@ -23,6 +23,7 @@ public class JwtTokenService : ITokenService
             new(JwtRegisteredClaimNames.Email, user.Email),
             new(ClaimTypes.Role, user.Role?.Name ?? string.Empty),
             new("supplierId", user.SupplierId?.ToString() ?? string.Empty),
+            new("branchOfficeId", user.BranchOfficeId?.ToString() ?? string.Empty),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

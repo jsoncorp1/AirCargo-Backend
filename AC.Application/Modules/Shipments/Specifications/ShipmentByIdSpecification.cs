@@ -10,6 +10,8 @@ public class ShipmentByIdSpecification : Specification<Shipment>
         Query
             .Where(s => s.Id == id)
             .Include(s => s.OrderDelivery)
+            .Include(s => s.OriginBranchOffice)
+            .Include(s => s.DestinationBranchOffice)
             .Include(s => s.ShipmentDetails.Where(d => d.Active))
                 .ThenInclude(d => d.OrderDeliveryDetail);
     }

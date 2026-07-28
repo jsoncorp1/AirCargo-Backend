@@ -12,6 +12,7 @@ public sealed class UserByEmailSpecification : Specification<User>
         Query
             .Where(u => u.Email.ToLower() == normalizedEmail)
             .Include(u => u.Role)
-            .Include(u => u.Supplier);
+            .Include(u => u.Supplier)
+            .Include(u => u.BranchOffice);
     }
 }
