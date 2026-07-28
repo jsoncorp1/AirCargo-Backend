@@ -1,12 +1,15 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Modules.Articles.Commands.DeleteArticle;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Articles.DeleteArticle;
 
+[Authorize(Roles = RoleNames.SuperAdminAdmin)]
 public class DeleteArticleEndPoint(IMediator mediator)
     : EndpointBaseAsync
         .WithRequest<Guid>

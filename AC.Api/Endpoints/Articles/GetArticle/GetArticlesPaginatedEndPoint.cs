@@ -1,13 +1,17 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
+using AC.Application.Abstractions.Security;
 using AC.Application.Modules.Articles.Queries.GetArticlesPaginated;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Articles.GetArticle;
 
-public class GetArticlesPaginatedEndPoint(IMediator mediator)
+[Authorize(Roles = RoleNames.SuperAdminAdminUsuarioEmpresa)]
+public class GetArticlesPaginatedEndPoint(IMediator mediator, ICurrentUser currentUser)
     : EndpointBaseAsync
         .WithRequest<GetArticlesPaginatedRequest>
         .WithActionResult<GetArticlesPaginatedQueryResult>
@@ -15,6 +19,7 @@ public class GetArticlesPaginatedEndPoint(IMediator mediator)
     [HttpGet("api/v1/core/articles")]
     [SwaggerOperation(Tags = ["Core / Articles"])]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(GetArticlesPaginatedQueryResult))]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ProblemDetails))]
     public override async Task<ActionResult<GetArticlesPaginatedQueryResult>> HandleAsync(
         [FromQuery] GetArticlesPaginatedRequest request,
         CancellationToken cancellationToken = default)
@@ -24,12 +29,13 @@ public class GetArticlesPaginatedEndPoint(IMediator mediator)
             {
                 Page = request.Page,
                 PerPage = request.PerPage,
+                UserId = currentUser.UserId!.Value,
                 SupplierId = request.SupplierId,
                 ArticleName = request.ArticleName
             },
             cancellationToken);
 
-        return Ok(result.Value);
+        return result.Failure ? this.ToProblem(result) : Ok(result.Value);
     }
 }
 

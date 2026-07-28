@@ -1,12 +1,17 @@
 using AC.Application.Abstractions.Messaging.Queries;
 using AC.Application.Modules.ArticleReceipts.Specifications;
+using AC.Application.Modules.Users.Specifications;
 using AC.Domain.Modules.ArticleReceipts;
+using AC.Domain.Modules.Roles;
+using AC.Domain.Modules.Users;
 using AC.Domain.Persistence;
 using AC.Domain.Results;
 
 namespace AC.Application.Modules.ArticleReceipts.Queries.GetArticleReceiptsPaginated;
 
-public class GetArticleReceiptsPaginatedQueryHandler(IRepository<ArticleReceipt> repository)
+public class GetArticleReceiptsPaginatedQueryHandler(
+    IRepository<ArticleReceipt> repository,
+    IRepository<User> userRepository)
     : IQueryHandler<GetArticleReceiptsPaginatedQuery, GetArticleReceiptsPaginatedQueryResult>
 {
     public async Task<Result<GetArticleReceiptsPaginatedQueryResult>> HandleAsync(
@@ -15,7 +20,25 @@ public class GetArticleReceiptsPaginatedQueryHandler(IRepository<ArticleReceipt>
         int page = query.Page < 1 ? 1 : query.Page;
         int perPage = query.PerPage is < 1 or > 100 ? 10 : query.PerPage;
 
-        var spec = new ArticleReceiptPaginationSpecification(page, perPage, query.ArticleId);
+        var actor = await userRepository.GetBySpecificationAsync(
+            new UserByIdSpecification(query.UserId), cancellationToken);
+
+        if (actor is null)
+            return Result.Fail<GetArticleReceiptsPaginatedQueryResult>(
+                "El usuario autenticado no existe.", "articlereceipt.user.notfound");
+
+        // usuarioempresa solo ve recepciones de artículos de su proveedor.
+        Guid? supplierId = null;
+        if (actor.Role.Name == RoleNames.UsuarioEmpresa)
+        {
+            if (actor.SupplierId is null)
+                return Result.Fail<GetArticleReceiptsPaginatedQueryResult>(
+                    "El usuario no pertenece a ningún proveedor.", "articlereceipt.user.notsupplier");
+
+            supplierId = actor.SupplierId;
+        }
+
+        var spec = new ArticleReceiptPaginationSpecification(page, perPage, query.ArticleId, supplierId);
         var result = await repository.GetPaginatedAsync(spec, cancellationToken);
 
         return Result.Success(new GetArticleReceiptsPaginatedQueryResult

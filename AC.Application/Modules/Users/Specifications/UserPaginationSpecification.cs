@@ -6,7 +6,9 @@ namespace AC.Application.Modules.Users.Specifications;
 
 public sealed class UserPaginationSpecification : PaginationSpecification<User>
 {
-    public UserPaginationSpecification(int page, int perPage, Guid? roleId = null, Guid? supplierId = null)
+    public UserPaginationSpecification(
+        int page, int perPage, Guid? roleId = null, Guid? supplierId = null,
+        string? roleName = null, Guid? branchOfficeId = null)
         : base(page, perPage)
     {
         Query
@@ -20,5 +22,12 @@ public sealed class UserPaginationSpecification : PaginationSpecification<User>
 
         if (supplierId is not null)
             Query.Where(u => u.SupplierId == supplierId);
+
+        // Alcance del admin: solo conductores de su sucursal.
+        if (roleName is not null)
+            Query.Where(u => u.Role.Name == roleName);
+
+        if (branchOfficeId is not null)
+            Query.Where(u => u.BranchOfficeId == branchOfficeId);
     }
 }

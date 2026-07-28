@@ -2,12 +2,15 @@ using System.Net;
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Modules.Suppliers.Queries.GetSuppliersPaginated;
 using AC.Domain.Modules.OrderDeliveries;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Suppliers.GetSupplier;
 
+[Authorize(Roles = RoleNames.SuperAdmin)]
 public class GetSuppliersPaginatedEndPoint(IMediator mediator)
     : EndpointBaseAsync
         .WithRequest<GetSuppliersPaginatedRequest>

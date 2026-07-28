@@ -1,12 +1,15 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Modules.Suppliers.Commands.DeleteSupplier;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Suppliers.DeleteSupplier;
 
+[Authorize(Roles = RoleNames.SuperAdmin)]
 public class DeleteSupplierEndPoint(IMediator mediator)
     : EndpointBaseAsync
         .WithRequest<Guid>

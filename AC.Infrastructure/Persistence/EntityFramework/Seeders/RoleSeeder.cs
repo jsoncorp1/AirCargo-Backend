@@ -9,6 +9,7 @@ public class RoleSeeder(CoreDbContext dbContext, ILogger<RoleSeeder> logger)
     public static readonly Guid SuperAdminId     = new("11111111-1111-1111-1111-111111111111");
     public static readonly Guid AdminId          = new("22222222-2222-2222-2222-222222222222");
     public static readonly Guid UsuarioEmpresaId = new("33333333-3333-3333-3333-333333333333");
+    public static readonly Guid ConductorId      = new("44444444-4444-4444-4444-444444444444");
 
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
@@ -29,9 +30,10 @@ public class RoleSeeder(CoreDbContext dbContext, ILogger<RoleSeeder> logger)
 
         var definitions = new[]
             {
-                Def(SuperAdminId,     "superadmin",     "Acceso total al sistema"),
-                Def(AdminId,          "admin",          "Administración general"),
-                Def(UsuarioEmpresaId, "usuarioempresa", "Usuario de empresa proveedora"),
+                Def(SuperAdminId,     RoleNames.SuperAdmin,     "Acceso total al sistema"),
+                Def(AdminId,          RoleNames.Admin,          "Administración general de su sucursal"),
+                Def(UsuarioEmpresaId, RoleNames.UsuarioEmpresa, "Usuario de empresa proveedora"),
+                Def(ConductorId,      RoleNames.Conductor,      "Conductor de reparto"),
             }
             .Where(r => !existing.Contains(r.Name))
             .ToArray();

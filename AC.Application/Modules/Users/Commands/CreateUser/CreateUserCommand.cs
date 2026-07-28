@@ -4,6 +4,9 @@ namespace AC.Application.Modules.Users.Commands.CreateUser;
 
 public class CreateUserCommand : ICommand<CreateUserCommandResult>
 {
+    // Usuario autenticado que crea; admin solo puede crear conductores de su sucursal.
+    public Guid ActorUserId { get; set; }
+
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;

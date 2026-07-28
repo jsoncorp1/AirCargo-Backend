@@ -1,14 +1,18 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
+using AC.Application.Abstractions.Security;
 using AC.Application.Modules.Shipments.Commands.ChangeShipmentStatus;
 using AC.Domain.Modules.Shipments;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Shipments.ChangeShipmentStatus;
 
-public class PatchShipmentStatusEndPoint(IMediator mediator)
+[Authorize(Roles = RoleNames.SuperAdminAdminConductor)]
+public class PatchShipmentStatusEndPoint(IMediator mediator, ICurrentUser currentUser)
     : EndpointBaseAsync
         .WithRequest<PatchShipmentStatusRequest>
         .WithActionResult<ChangeShipmentStatusCommandResult>
@@ -18,12 +22,14 @@ public class PatchShipmentStatusEndPoint(IMediator mediator)
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ChangeShipmentStatusCommandResult))]
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(ProblemDetails))]
+    [ProducesResponseType((int)HttpStatusCode.Forbidden, Type = typeof(ProblemDetails))]
     public override async Task<ActionResult<ChangeShipmentStatusCommandResult>> HandleAsync(
         PatchShipmentStatusRequest request, CancellationToken cancellationToken = default)
     {
         var command = new ChangeShipmentStatusCommand
         {
             Id = request.Id,
+            UserId = currentUser.UserId!.Value,
             Status = request.Body.Status,
             Observation = request.Body.Observation,
             DeliveryComment = request.Body.DeliveryComment
@@ -32,13 +38,7 @@ public class PatchShipmentStatusEndPoint(IMediator mediator)
         var result = await mediator.SendCommandAsync<ChangeShipmentStatusCommand, ChangeShipmentStatusCommandResult>(
             command, cancellationToken);
 
-        if (result.Failure)
-        {
-            var problem = new ProblemDetails { Title = result.ErrorKey, Detail = result.Error };
-            return result.ErrorKey == "shipment.notfound" ? NotFound(problem) : BadRequest(problem);
-        }
-
-        return Ok(result.Value);
+        return result.Failure ? this.ToProblem(result) : Ok(result.Value);
     }
 }
 

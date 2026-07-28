@@ -1,5 +1,6 @@
 using AC.Application.Abstractions.Messaging.Commands;
 using AC.Application.Modules.Users.Specifications;
+using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Suppliers;
 using AC.Domain.Modules.Users;
 using AC.Domain.Persistence;
@@ -21,6 +22,19 @@ public class DeleteUserCommandHandler(
 
         if (user is null)
             return Result.Fail<DeleteUserCommandResult>("Usuario no encontrado.", "user.notfound");
+
+        var actor = await repository.GetBySpecificationAsync(
+            new UserByIdSpecification(command.ActorUserId), cancellationToken);
+
+        if (actor is null)
+            return Result.Fail<DeleteUserCommandResult>(
+                "El usuario autenticado no existe.", "user.actor.notfound");
+
+        // El admin solo gestiona conductores de su propia sucursal.
+        if (actor.Role.Name == RoleNames.Admin
+            && (user.Role.Name != RoleNames.Conductor || user.BranchOfficeId != actor.BranchOfficeId))
+            return Result.Fail<DeleteUserCommandResult>(
+                "Un admin solo puede eliminar conductores de su sucursal.", "user.access.forbidden");
 
         user.Active = false; // soft-delete; el interceptor pone DeletedAt/DeletedBy
 

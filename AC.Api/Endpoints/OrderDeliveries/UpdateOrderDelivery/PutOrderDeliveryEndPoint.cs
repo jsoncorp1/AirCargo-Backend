@@ -1,14 +1,18 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
+using AC.Application.Abstractions.Security;
 using AC.Application.Modules.OrderDeliveries.Commands.UpdateOrderDelivery;
 using AC.Domain.Modules.OrderDeliveries;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.OrderDeliveries.UpdateOrderDelivery;
 
-public class PutOrderDeliveryEndPoint(IMediator mediator)
+[Authorize(Roles = RoleNames.SuperAdminUsuarioEmpresa)]
+public class PutOrderDeliveryEndPoint(IMediator mediator, ICurrentUser currentUser)
     : EndpointBaseAsync
         .WithRequest<PutOrderDeliveryRequest>
         .WithActionResult<UpdateOrderDeliveryCommandResult>
@@ -18,12 +22,14 @@ public class PutOrderDeliveryEndPoint(IMediator mediator)
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(UpdateOrderDeliveryCommandResult))]
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(ProblemDetails))]
+    [ProducesResponseType((int)HttpStatusCode.Forbidden, Type = typeof(ProblemDetails))]
     public override async Task<ActionResult<UpdateOrderDeliveryCommandResult>> HandleAsync(
         PutOrderDeliveryRequest request, CancellationToken cancellationToken = default)
     {
         var command = new UpdateOrderDeliveryCommand
         {
             Id = request.Id,
+            UserId = currentUser.UserId!.Value,
             DestinationDepartment = request.Body.DestinationDepartment,
             ClientPhone = request.Body.ClientPhone,
             ClientFullName = request.Body.ClientFullName,
@@ -41,13 +47,7 @@ public class PutOrderDeliveryEndPoint(IMediator mediator)
         var result = await mediator.SendCommandAsync<UpdateOrderDeliveryCommand, UpdateOrderDeliveryCommandResult>(
             command, cancellationToken);
 
-        if (result.Failure)
-        {
-            var problem = new ProblemDetails { Title = result.ErrorKey, Detail = result.Error };
-            return result.ErrorKey == "orderdelivery.notfound" ? NotFound(problem) : BadRequest(problem);
-        }
-
-        return Ok(result.Value);
+        return result.Failure ? this.ToProblem(result) : Ok(result.Value);
     }
 }
 

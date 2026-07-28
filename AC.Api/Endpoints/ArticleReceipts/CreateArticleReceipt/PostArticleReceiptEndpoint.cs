@@ -1,12 +1,15 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Modules.ArticleReceipts.Commands.CreateArticleReceipt;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.ArticleReceipts.CreateArticleReceipt;
 
+[Authorize(Roles = RoleNames.SuperAdminAdmin)]
 public class PostArticleReceiptEndPoint(IMediator mediator)
     : EndpointBaseAsync
         .WithRequest<CreateArticleReceiptRequest>

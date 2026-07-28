@@ -1,13 +1,17 @@
-﻿using System.Net;
+using System.Net;
 using AC.Application.Abstractions.Messaging;
+using AC.Application.Abstractions.Security;
 using AC.Application.Modules.Users.Queries.GetUserById;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Users.GetUser;
 
-public class GetUserEndPoint(IMediator mediator)
+[Authorize(Roles = RoleNames.SuperAdminAdmin)]
+public class GetUserEndPoint(IMediator mediator, ICurrentUser currentUser)
     : EndpointBaseAsync
         .WithRequest<Guid>
         .WithActionResult<GetUserByIdQueryResult>
@@ -16,17 +20,13 @@ public class GetUserEndPoint(IMediator mediator)
     [SwaggerOperation(Tags = ["Core / Users"])]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(GetUserByIdQueryResult))]
     [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(ProblemDetails))]
+    [ProducesResponseType((int)HttpStatusCode.Forbidden, Type = typeof(ProblemDetails))]
     public override async Task<ActionResult<GetUserByIdQueryResult>> HandleAsync(
         [FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
         var result = await mediator.SendQueryAsync<GetUserByIdQuery, GetUserByIdQueryResult>(
-            new GetUserByIdQuery { Id = id }, cancellationToken);
+            new GetUserByIdQuery { Id = id, UserId = currentUser.UserId!.Value }, cancellationToken);
 
-        if (result.Failure)
-            return result.ErrorKey.EndsWith(".notfound")
-                ? NotFound(new ProblemDetails { Title = result.ErrorKey, Detail = result.Error })
-                : BadRequest(new ProblemDetails { Title = result.ErrorKey, Detail = result.Error });
-
-        return Ok(result.Value);
+        return result.Failure ? this.ToProblem(result) : Ok(result.Value);
     }
 }

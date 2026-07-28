@@ -1,231 +1,224 @@
-# Multisucursal: sucursales, usuarios por sucursal y estados de envío
+# Roles, permisos, scoping por rol y datos semilla
 
-Documentación para el frontend de los cambios del modelo multisucursal:
+Documentación para el frontend de los cambios de esta versión:
 
-1. Nueva entidad **BranchOffice** (sucursales) con su CRUD.
-2. Los **usuarios** ahora pueden pertenecer a una sucursal (relación nullable).
-3. Los **shipments** registran sucursal de **origen** y **destino**, tienen
-   **estado**, **observación** del delivery y **comentario** del delivery.
-4. Nuevos **filtros** en el listado de shipments (proveedor, sucursales, estado).
+1. **Base de datos reseteada** y migraciones consolidadas en una sola; nuevos
+   datos semilla (roles, sucursales, proveedores y usuarios).
+2. **Autorización por rol** en TODOS los endpoints: superadmin, admin,
+   usuarioempresa y conductor (rol nuevo). Un request con rol no permitido
+   recibe **403**.
+3. **Scoping automático server-side**: usuarioempresa solo ve datos de SU
+   proveedor; admin y conductor solo ven envíos de SU sucursal. Los filtros
+   que mandaba el front para esto ahora se ignoran o se fuerzan en el backend.
+
+> ⚠️ **La base de datos fue vaciada por completo.** Todos los IDs anteriores
+> (artículos, órdenes, envíos, usuarios, sucursales) dejaron de existir. Los
+> tokens viejos apuntan a usuarios que ya no existen: **hay que volver a
+> loguearse** con las credenciales semilla de abajo.
 
 ---
 
-## 1. Sucursales (`BranchOffice`)
+## 1. Datos semilla
 
-Entidad nueva. Ruta base: `api/v1/core/branch-offices`.
+### Roles (`roles`)
 
-| Campo | Tipo | Notas |
+| Id | Nombre | Descripción |
 |---|---|---|
-| `id` | guid | |
-| `code` | string (≤20) | Único entre sucursales activas |
-| `bolivianDepartment` | enum string | `LaPaz`, `SantaCruz`, `Cochabamba`, etc. |
-| `city` | string (≤100) | |
-| `address` | string? (≤300) | Opcional |
-| `latitude` / `longitude` | double? | Opcionales |
-| `phone` | string (≤30) | |
-| `active` | bool | Soft delete |
+| `11111111-1111-1111-1111-111111111111` | `superadmin` | Acceso total al sistema |
+| `22222222-2222-2222-2222-222222222222` | `admin` | Administración general de su sucursal |
+| `33333333-3333-3333-3333-333333333333` | `usuarioempresa` | Usuario de empresa proveedora |
+| `44444444-4444-4444-4444-444444444444` | `conductor` | Conductor de reparto (**NUEVO**) |
 
-### Endpoints
+### Sucursales (`branch_offices`)
 
-- `POST /api/v1/core/branch-offices` — crea una sucursal.
-- `PUT /api/v1/core/branch-offices/{id}` — actualiza.
-- `DELETE /api/v1/core/branch-offices/{id}` — soft delete.
-- `GET /api/v1/core/branch-offices/{id}` — detalle.
-- `GET /api/v1/core/branch-offices?page=1&perPage=10` — listado paginado.
+| Id | Code | Ciudad | Departamento | Teléfono |
+|---|---|---|---|---|
+| `b1111111-1111-1111-1111-111111111111` | `SCZ-01` | Santa Cruz | `SantaCruz` | 70000001 |
+| `b2222222-2222-2222-2222-222222222222` | `LPZ-01` | La Paz | `LaPaz` | 70000002 |
+| `b3333333-3333-3333-3333-333333333333` | `EAL-01` | El Alto | `LaPaz` | 70000003 |
+| `b4444444-4444-4444-4444-444444444444` | `TDD-01` | Trinidad | `Beni` | 70000004 |
+| `b5555555-5555-5555-5555-555555555555` | `GYA-01` | Guayaramerín | `Beni` | 70000005 |
+
+### Proveedores (`suppliers`)
+
+| Id | Nombre | Departamento |
+|---|---|---|
+| `a1111111-1111-1111-1111-111111111111` | Laminas | `SantaCruz` |
+| `a2222222-2222-2222-2222-222222222222` | Viralshop | `SantaCruz` |
+
+### Usuarios (`users`) — password de TODOS: `Harold123`
+
+Los emails se guardan **en minúsculas**; el login es por email exacto.
+
+| Id | Email | Rol | Proveedor | Sucursal |
+|---|---|---|---|---|
+| `c1111111-…` | harold@gmail.com | superadmin | — | Santa Cruz |
+| `c2222222-…` | damian@gmail.com | usuarioempresa | Laminas | — |
+| `c3333333-…` | ruben@gmail.com | usuarioempresa | Viralshop | — |
+| `c4444444-…` | camila@gmail.com | admin | — | Santa Cruz |
+| `c5555555-…` | camilo@gmail.com | admin | — | La Paz |
+| `c6666666-…` | wilson@gmail.com | conductor | — | Santa Cruz |
+| `c7777777-…` | rolando@gmail.com | conductor | — | La Paz |
+| `c8888888-…` | jhonatan@gmail.com | conductor | — | La Paz |
+
+(Los GUID completos repiten el dígito: `c1111111-1111-1111-1111-111111111111`, etc.)
+
+El login (`POST api/v1/core/auth/login`) no cambió: sigue devolviendo `role`,
+`supplierId`, `branchOfficeId`, etc., y el JWT lleva esos mismos claims.
+
+---
+
+## 2. Matriz de permisos por endpoint
+
+Roles permitidos por módulo/verbo. Cualquier otro rol recibe **403** (del
+middleware, body vacío). "suyos" = scoping automático de la sección 3.
+
+| Endpoint | superadmin | admin | usuarioempresa | conductor |
+|---|---|---|---|---|
+| `POST /auth/login` | ✓ (anónimo) | ✓ | ✓ | ✓ |
+| Roles (CRUD completo) | ✓ | ✗ | ✗ | ✗ |
+| Suppliers (CRUD completo) | ✓ | ✗ | ✗ | ✗ |
+| BranchOffices GET (lista y por id) | ✓ | ✓ | ✗ | ✗ |
+| BranchOffices POST/PUT/DELETE | ✓ | ✗ | ✗ | ✗ |
+| Users (CRUD completo) | ✓ | ✓ solo conductores de su sucursal | ✗ | ✗ |
+| Articles GET | ✓ | ✓ | ✓ solo los suyos | ✗ |
+| Articles POST/PUT/DELETE | ✓ | ✓ | ✗ | ✗ |
+| ArticleReceipts GET | ✓ | ✓ | ✓ solo las suyas | ✗ |
+| ArticleReceipts POST/PUT/DELETE | ✓ | ✓ | ✗ | ✗ |
+| OrderDeliveries GET | ✓ | ✓ | ✓ solo las suyas | ✗ |
+| OrderDeliveries POST/PUT/DELETE | ✓ | ✗ | ✓ solo las suyas | ✗ |
+| Shipments GET | ✓ | ✓ su sucursal | ✓ los suyos | ✓ su sucursal |
+| Shipments POST / POST sporadic / PUT / DELETE | ✓ | ✓ su sucursal | ✗ | ✗ |
+| Shipments PATCH `/{id}/status` | ✓ | ✓ su sucursal | ✗ | ✓ su sucursal |
+
+---
+
+## 3. Scoping automático — qué filtros ya NO debe mandar el front
+
+El backend relee al usuario de BD en cada request (no confía en los claims del
+JWT) y decide el alcance según su rol:
+
+- **usuarioempresa**: en `GET /articles`, `GET /article-receipts`,
+  `GET /order-deliveries` y `GET /shipments` el backend **fuerza**
+  `supplierId = el del usuario`. Si el front manda otro `supplierId`, **se
+  ignora**. En los `GET /{id}`, PUT y DELETE, si el recurso no es de su
+  proveedor responde **403** (`*.access.forbidden`).
+- **admin** y **conductor**: `GET /shipments` y `GET /shipments/{id}` se
+  limitan a envíos cuyo **origen o destino** sea su sucursal. Lo mismo aplica
+  a PUT/DELETE de shipments (admin) y al PATCH de estado (ambos).
+- **superadmin**: sin restricciones; todos los filtros del request se respetan.
 
 ```jsonc
-// POST /api/v1/core/branch-offices
+// GET /api/v1/core/articles?supplierId=<otro-proveedor>   (como damian, usuarioempresa)
+// → 200, pero la lista viene SOLO con artículos de Laminas (el filtro se ignoró)
+
+// GET /api/v1/core/articles/{id-de-articulo-de-viralshop}  (como damian)
+// → 403
 {
-  "code": "SCZ-01",
-  "bolivianDepartment": "SantaCruz",
-  "city": "Santa Cruz de la Sierra",
-  "address": "Av. Ejemplo 123",     // opcional
-  "latitude": -17.7833,             // opcional
-  "longitude": -63.1821,            // opcional
-  "phone": "77712345"
+  "title": "article.access.forbidden",           // NUEVO
+  "detail": "El artículo no pertenece al proveedor del usuario."
 }
+```
+
+> Los errores de permisos siempre llegan como `ProblemDetails` con `title` =
+> error key y `detail` = mensaje en español. El 403 del middleware (rol no
+> permitido en el endpoint) llega **sin body**.
+
+---
+
+## 4. Conductor: cambio de estado de envíos
+
+El conductor solo usa `GET /shipments`, `GET /shipments/{id}` y
+`PATCH /shipments/{id}/status`, siempre sobre envíos de su sucursal.
+
+Body del PATCH (sin cambios de formato): mandar `status` **o** `observation`
+(no ambos), y opcionalmente `deliveryComment`.
+
+Transiciones de `status` válidas:
+
+| Desde | Hacia |
+|---|---|
+| `Pending` | `InTransit` |
+| `InTransit` | `Observed`, `Delivered`, `Rejected`, `Returned` |
+| `Observed` | `InTransit`, `Delivered`, `Rejected`, `Returned` |
+| `Rejected` | `Returned` |
+| `Delivered` / `Returned` | (finales, ninguna) |
+
+Observaciones (solo con envío `InTransit` u `Observed`); el estado se deriva:
+
+| `observation` | Estado resultante |
+|---|---|
+| `CustomerRefused` | `Rejected` |
+| `NoAnswerDay1..3`, `CustomerTraveling`, `WrongPhoneNumber`, `TooFar`, `NotDeliveredOnTime`, `InProvince` | `Observed` |
+
+```jsonc
+// PATCH /api/v1/core/shipments/{id}/status   (como wilson, conductor SCZ)
+{ "status": "Delivered", "deliveryComment": "Entregado al cliente" }
+// → 200
+
+// mismo PATCH sobre un envío La Paz → Trinidad
+// → 403 { "title": "shipment.statuschange.forbidden", ... }   // NUEVO
 ```
 
 ---
 
-## 2. Usuarios: sucursal opcional (`branchOfficeId`)
+## 5. Gestión de conductores por admin
 
-Un usuario (por ejemplo con rol admin o de mostrador) puede pertenecer a una
-sucursal. Es **nullable**: los usuarios de proveedores no llevan sucursal.
+El admin puede usar el CRUD de `/users`, pero **solo** sobre conductores de su
+propia sucursal:
 
-**Se manda (request) en:**
-- `POST /api/v1/core/users` — nuevo campo `branchOfficeId` (guid, opcional).
-- `PUT /api/v1/core/users/{id}` — ídem.
+- `GET /users` como admin devuelve **solo conductores de su sucursal**
+  (los filtros `role`/`supplierId` del request se ignoran).
+- `POST /users` como admin: el `roleId` debe ser el de conductor y el
+  `branchOfficeId` debe ser su sucursal; si no, 403 (`user.role.forbidden` /
+  `user.branchoffice.forbidden`).
+- `PUT` / `DELETE /users/{id}` como admin: solo si el usuario objetivo es
+  conductor de su sucursal (403 `user.access.forbidden`); no puede cambiarle
+  el rol ni moverlo de sucursal.
 
-**Se devuelve (response) en:**
-- Respuestas de los endpoints de arriba (`branchOfficeId`).
-- `GET /api/v1/core/users/{id}` y `GET /api/v1/core/users` (paginado):
-  `branchOfficeId`, `branchOfficeCode`, `branchOfficeCity`.
+Además, para **cualquier** actor (también superadmin) se valida coherencia
+rol ↔ alcance al crear/editar usuarios:
 
-> **Importante:** la sucursal del usuario autenticado es la que se usa como
-> **origen** al atender un envío. Un usuario sin sucursal asignada **no puede
-> atender envíos** (el backend responde `shipment.originbranch.missing`).
-
-### Login: sucursal en la respuesta y en el token
-
-`POST /api/v1/core/auth/login` ahora devuelve también `branchOfficeId`,
-`branchOfficeCode` y `branchOfficeCity` (los tres `null` si el usuario no
-tiene sucursal).
-
-Además, el **JWT incluye el claim `branchOfficeId`** junto a `supplierId`
-(string vacío si el usuario no tiene sucursal). El front puede leerlo del
-token para mostrar la sucursal activa sin llamadas extra.
-
-```jsonc
-// Payload del JWT (decodificado)
-{
-  "sub": "…",
-  "email": "…",
-  "role": "Admin",
-  "supplierId": "",
-  "branchOfficeId": "3f2a…",   // NUEVO — "" si no tiene sucursal
-  "jti": "…"
-}
-```
-
-> Ojo: si se cambia la sucursal de un usuario, el claim queda desactualizado
-> hasta que vuelva a loguearse. El backend no confía en el claim para atender
-> envíos: siempre valida la sucursal actual del usuario en la base de datos.
-
-### Acción para el front
-
-- [ ] Agregar un select de sucursal (opcional) en los formularios de crear y
-      editar usuario (llenar con `GET /branch-offices`).
-- [ ] Tomar `branchOfficeId`/`branchOfficeCode`/`branchOfficeCity` de la
-      respuesta del login (o el claim `branchOfficeId` del token) para
-      mostrar la sucursal activa del usuario.
+- rol `usuarioempresa` ⇒ `supplierId` obligatorio y `branchOfficeId` en null.
+- rol `admin` o `conductor` ⇒ `branchOfficeId` obligatorio y `supplierId` en null.
 
 ---
 
-## 3. Shipments multisucursal, estados y observaciones
+## 6. Error keys nuevos
 
-### Sucursales de origen y destino
+| Error key | HTTP | Cuándo |
+|---|---|---|
+| `*.access.forbidden` (`article.`, `articlereceipt.`, `orderdelivery.`, `shipment.`, `user.`) | 403 | El recurso no pertenece al proveedor/sucursal del usuario |
+| `shipment.statuschange.forbidden` | 403 | Admin/conductor intenta cambiar estado de un envío de otra sucursal |
+| `user.role.forbidden` | 403 | Admin intenta crear/asignar un rol distinto de conductor |
+| `user.branchoffice.forbidden` | 403 | Admin intenta crear/mover un conductor a otra sucursal |
+| `*.user.notsupplier` (`article.`, `articlereceipt.`, `orderdelivery.`, `shipment.`) | 400 | El usuarioempresa autenticado no tiene proveedor asignado |
+| `shipment.user.nobranch`, `user.actor.nobranch` | 400 | El admin/conductor autenticado no tiene sucursal asignada |
+| `user.supplierid.required` / `user.supplierid.notallowed` | 400 | Coherencia rol ↔ proveedor al crear/editar usuario |
+| `user.branchofficeid.required` / `user.branchofficeid.notallowed` | 400 | Coherencia rol ↔ sucursal al crear/editar usuario |
+| `*.user.notfound`, `user.actor.notfound` | 404 | El usuario autenticado ya no existe en BD (token huérfano) |
 
-Al atender una orden (crear el shipment) se registran:
+Se mantienen los existentes (`shipment.statuschange.invalidtransition`,
+`shipment.observation.invalidstatus`, `orderdelivery.alreadyattended`, etc.).
 
-- **Origen** (`originBranchOfficeId`): lo pone el backend automáticamente con
-  la sucursal del usuario autenticado — **no se manda en el request**.
-- **Destino** (`destinationBranchOfficeId`): **se manda en el request** (nuevo
-  campo obligatorio).
+---
 
-Aplica a:
-- `POST /api/v1/core/shipments` (atender una orden corporativa)
-- `POST /api/v1/core/shipments/sporadic` (envío esporádico)
+## 7. Acción para el front
 
-```jsonc
-// POST /api/v1/core/shipments
-{
-  "orderDeliveryId": "…",
-  "destinationBranchOfficeId": "…",   // NUEVO — obligatorio
-  "packageCount": 3,
-  "packageDescription": "3 cajas",
-  "lines": [ /* igual que antes */ ]
-}
-```
-
-En los shipments creados antes de este cambio, ambas sucursales vienen `null`.
-
-### Estado (`status`)
-
-Enum string. Un shipment **nace en `InTransit`** al ser atendido.
-
-| Valor | Significado |
-|---|---|
-| `Pending` | Pendiente |
-| `InTransit` | En tránsito (estado inicial) |
-| `Observed` | Observado (se llega al registrar una observación) |
-| `Delivered` | Entregado |
-| `Rejected` | Rechazado |
-| `Returned` | Devuelto |
-
-Transiciones válidas para cambio manual de estado:
-
-- `Pending` → `InTransit`
-- `InTransit` → `Observed`, `Delivered`, `Rejected`, `Returned`
-- `Observed` → `InTransit`, `Delivered`, `Rejected`, `Returned`
-- `Rejected` → `Returned`
-- `Delivered` y `Returned` son finales.
-
-### Observación (`observation`)
-
-Enum string, nullable. Al registrar una observación **el estado cambia solo**:
-
-- `CustomerRefused` (no quiere) → el estado pasa a **`Rejected`**.
-- Cualquier otra → el estado pasa a **`Observed`**.
-
-| Valor | Significado |
-|---|---|
-| `CustomerRefused` | No quiere |
-| `NoAnswerDay1` | No contesta día 1 |
-| `NoAnswerDay2` | No contesta día 2 |
-| `NoAnswerDay3` | No contesta día 3 |
-| `CustomerTraveling` | Está de viaje |
-| `WrongPhoneNumber` | Número incorrecto |
-| `TooFar` | Muy lejos |
-| `NotDeliveredOnTime` | No se entregó a tiempo |
-| `InProvince` | En provincia |
-
-Solo se puede observar un envío en estado `InTransit` u `Observed`.
-
-### Comentario del delivery (`deliveryComment`)
-
-Texto libre, nullable, ≤500 caracteres.
-
-### Nuevo endpoint: cambiar estado / observar / comentar
-
-`PATCH /api/v1/core/shipments/{id}/status`
-
-Mandar **`status` o `observation`, no ambos** (la observación define el estado
-sola). `deliveryComment` puede ir solo o acompañando a cualquiera de los dos.
-
-```jsonc
-// Cambio manual de estado
-{ "status": "Delivered" }
-
-// Registrar observación (el estado pasa a Observed)
-{ "observation": "NoAnswerDay1", "deliveryComment": "Llamé 3 veces" }
-
-// Observación de rechazo (el estado pasa a Rejected)
-{ "observation": "CustomerRefused" }
-```
-
-Respuesta: `{ id, code, status, observation, deliveryComment }`.
-
-Errores (`400`, con `title` = clave):
-- `shipment.statuschange.empty` — no se mandó nada.
-- `shipment.statuschange.conflict` — se mandaron `status` y `observation` juntos.
-- `shipment.statuschange.invalidtransition` — transición de estado no permitida.
-- `shipment.observation.invalidstatus` — el envío no está en `InTransit`/`Observed`.
-
-### Listado de shipments: nuevos filtros y campos
-
-`GET /api/v1/core/shipments` — filtros opcionales y **combinables** (sin
-filtros se ve todo en general):
-
-| Query param | Filtra por |
-|---|---|
-| `supplierId` | Proveedor de la orden |
-| `originBranchOfficeId` | Sucursal de origen |
-| `destinationBranchOfficeId` | Sucursal de destino |
-| `status` | Estado (`InTransit`, `Observed`, …) |
-
-Cada ítem del listado ahora incluye además: `supplierId`,
-`originBranchOfficeId`, `originBranchOfficeCode`, `destinationBranchOfficeId`,
-`destinationBranchOfficeCode`, `status`, `observation`.
-
-`GET /api/v1/core/shipments/{id}` incluye además: sucursales de origen/destino
-(id, `code`, `city`), `status`, `observation` y `deliveryComment`.
-
-### Acción para el front
-
-- [ ] En el formulario de atender orden y de envío esporádico: select de
-      **sucursal de destino** (obligatorio). El origen no se pide.
-- [ ] Vista de shipments: columna de estado (badge) y filtros por proveedor,
-      sucursal origen/destino y estado.
-- [ ] Pantalla/modal del delivery: registrar observación + comentario, y
-      cambio manual de estado respetando las transiciones de arriba.
+- [ ] Actualizar las credenciales de desarrollo a los usuarios semilla
+      (password `Harold123`) y forzar re-login: los tokens e IDs viejos ya no
+      sirven.
+- [ ] Guardar el `role` del login y **ocultar menús/acciones según la matriz**
+      de la sección 2 (el backend igual bloquea, pero la UI no debe ofrecer lo
+      prohibido).
+- [ ] Como usuarioempresa, **dejar de mandar `supplierId`** en los listados: el
+      backend lo fuerza; el selector de proveedor solo tiene sentido para
+      superadmin (y admin donde aplique).
+- [ ] Como admin/conductor, asumir que los listados de envíos ya vienen
+      filtrados por su sucursal.
+- [ ] Manejar **403 con body `ProblemDetails`** (error keys `*.forbidden`) y el
+      403 **sin body** del middleware de roles.
+- [ ] Pantalla de conductores para admin: solo rol conductor y su sucursal
+      preseleccionada/bloqueada en el formulario.
+- [ ] Si superadmin cambia rol/proveedor/sucursal de un usuario, ese usuario
+      debe **re-loguearse** para que su token refleje el cambio.

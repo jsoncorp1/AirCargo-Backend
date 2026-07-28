@@ -2,12 +2,15 @@ using System.Net;
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Abstractions.Security;
 using AC.Application.Modules.Shipments.Commands.CreateShipment;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Shipments.CreateShipment;
 
+[Authorize(Roles = RoleNames.SuperAdminAdmin)]
 public class PostShipmentEndPoint(IMediator mediator, ICurrentUser currentUser)
     : EndpointBaseAsync
         .WithRequest<CreateShipmentRequest>

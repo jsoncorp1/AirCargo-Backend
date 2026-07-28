@@ -1,12 +1,15 @@
-﻿using System.Net;
+using System.Net;
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Modules.Roles.Commands.DeleteRole;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Roles.DeleteRole;
 
+[Authorize(Roles = RoleNames.SuperAdmin)]
 public class DeleteRoleEndPoint(IMediator mediator)
     : EndpointBaseAsync
         .WithRequest<Guid>

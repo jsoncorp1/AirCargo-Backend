@@ -3,12 +3,15 @@ using AC.Application.Abstractions.Messaging;
 using AC.Application.Abstractions.Security;
 using AC.Application.Modules.Shipments.Commands.CreateSporadicShipment;
 using AC.Domain.Modules.OrderDeliveries;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Shipments.CreateSporadicShipment;
 
+[Authorize(Roles = RoleNames.SuperAdminAdmin)]
 public class PostSporadicShipmentEndPoint(IMediator mediator, ICurrentUser currentUser)
     : EndpointBaseAsync
         .WithRequest<CreateSporadicShipmentRequest>

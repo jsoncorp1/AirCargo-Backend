@@ -1,12 +1,15 @@
-﻿using System.Net;
+using System.Net;
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Modules.Roles.Commands.UpdateRole;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Roles.UpdateRole;
 
+[Authorize(Roles = RoleNames.SuperAdmin)]
 public class PutRoleEndPoint(IMediator mediator)
     : EndpointBaseAsync
         .WithRequest<PutRoleRequest>

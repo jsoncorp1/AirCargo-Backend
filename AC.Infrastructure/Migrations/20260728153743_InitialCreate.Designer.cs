@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AC.Infrastructure.Migrations
 {
     [DbContext(typeof(CoreDbContext))]
-    [Migration("20260723230806_AddIsExpressToOrderDelivery")]
-    partial class AddIsExpressToOrderDelivery
+    [Migration("20260728153743_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,6 +146,90 @@ namespace AC.Infrastructure.Migrations
                         .HasDatabaseName("ix_articles_supplier_id");
 
                     b.ToTable("articles", (string)null);
+                });
+
+            modelBuilder.Entity("AC.Domain.Modules.BranchOffices.BranchOffice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("address");
+
+                    b.Property<string>("BolivianDepartment")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("bolivian_department");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("city");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("latitude");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("longitude");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("phone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_branch_offices");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("ix_branch_offices_code")
+                        .HasFilter("active = true");
+
+                    b.ToTable("branch_offices", (string)null);
                 });
 
             modelBuilder.Entity("AC.Domain.Modules.OrderDeliveries.OrderDelivery", b =>
@@ -436,9 +520,27 @@ namespace AC.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("deleted_by");
 
+                    b.Property<string>("DeliveryComment")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("delivery_comment");
+
+                    b.Property<Guid?>("DestinationBranchOfficeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("destination_branch_office_id");
+
+                    b.Property<string>("Observation")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("observation");
+
                     b.Property<Guid>("OrderDeliveryId")
                         .HasColumnType("uuid")
                         .HasColumnName("order_delivery_id");
+
+                    b.Property<Guid?>("OriginBranchOfficeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("origin_branch_office_id");
 
                     b.Property<int>("PackageCount")
                         .HasColumnType("integer")
@@ -459,6 +561,12 @@ namespace AC.Infrastructure.Migrations
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("shipping_price");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
                     b.Property<decimal>("TotalWeight")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
@@ -475,10 +583,16 @@ namespace AC.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_shipments");
 
+                    b.HasIndex("DestinationBranchOfficeId")
+                        .HasDatabaseName("ix_shipments_destination_branch_office_id");
+
                     b.HasIndex("OrderDeliveryId")
                         .IsUnique()
                         .HasDatabaseName("ix_shipments_order_delivery_id")
                         .HasFilter("active = true");
+
+                    b.HasIndex("OriginBranchOfficeId")
+                        .HasDatabaseName("ix_shipments_origin_branch_office_id");
 
                     b.HasIndex("SequenceNumber")
                         .IsUnique()
@@ -632,6 +746,10 @@ namespace AC.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("active");
 
+                    b.Property<Guid?>("BranchOfficeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("branch_office_id");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -693,6 +811,9 @@ namespace AC.Infrastructure.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_users");
+
+                    b.HasIndex("BranchOfficeId")
+                        .HasDatabaseName("ix_users_branch_office_id");
 
                     b.HasIndex("RoleId")
                         .HasDatabaseName("ix_users_role_id");
@@ -769,6 +890,12 @@ namespace AC.Infrastructure.Migrations
 
             modelBuilder.Entity("AC.Domain.Modules.Shipments.Shipment", b =>
                 {
+                    b.HasOne("AC.Domain.Modules.BranchOffices.BranchOffice", "DestinationBranchOffice")
+                        .WithMany("DestinationShipments")
+                        .HasForeignKey("DestinationBranchOfficeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_shipments_branch_offices_destination_branch_office_id");
+
                     b.HasOne("AC.Domain.Modules.OrderDeliveries.OrderDelivery", "OrderDelivery")
                         .WithMany("Shipments")
                         .HasForeignKey("OrderDeliveryId")
@@ -776,7 +903,17 @@ namespace AC.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_shipments_order_deliveries_order_delivery_id");
 
+                    b.HasOne("AC.Domain.Modules.BranchOffices.BranchOffice", "OriginBranchOffice")
+                        .WithMany("OriginShipments")
+                        .HasForeignKey("OriginBranchOfficeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_shipments_branch_offices_origin_branch_office_id");
+
+                    b.Navigation("DestinationBranchOffice");
+
                     b.Navigation("OrderDelivery");
+
+                    b.Navigation("OriginBranchOffice");
                 });
 
             modelBuilder.Entity("AC.Domain.Modules.Shipments.ShipmentDetail", b =>
@@ -802,6 +939,12 @@ namespace AC.Infrastructure.Migrations
 
             modelBuilder.Entity("AC.Domain.Modules.Users.User", b =>
                 {
+                    b.HasOne("AC.Domain.Modules.BranchOffices.BranchOffice", "BranchOffice")
+                        .WithMany("Users")
+                        .HasForeignKey("BranchOfficeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_users_branch_offices_branch_office_id");
+
                     b.HasOne("AC.Domain.Modules.Roles.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
@@ -815,6 +958,8 @@ namespace AC.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_users_suppliers_supplier_id");
 
+                    b.Navigation("BranchOffice");
+
                     b.Navigation("Role");
 
                     b.Navigation("Supplier");
@@ -823,6 +968,15 @@ namespace AC.Infrastructure.Migrations
             modelBuilder.Entity("AC.Domain.Modules.Articles.Article", b =>
                 {
                     b.Navigation("ArticleReceipts");
+                });
+
+            modelBuilder.Entity("AC.Domain.Modules.BranchOffices.BranchOffice", b =>
+                {
+                    b.Navigation("DestinationShipments");
+
+                    b.Navigation("OriginShipments");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("AC.Domain.Modules.OrderDeliveries.OrderDelivery", b =>

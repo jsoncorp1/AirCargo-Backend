@@ -42,6 +42,53 @@ public class UpdateUserCommandHandler(
         if (role is null)
             return Result.Fail<UpdateUserCommandResult>("El rol indicado no existe.", "user.role.notfound");
 
+        // Coherencia rol ↔ alcance: usuarioempresa pertenece a un proveedor,
+        // admin/conductor pertenecen a una sucursal.
+        if (role.Name == RoleNames.UsuarioEmpresa)
+        {
+            if (command.SupplierId is null)
+                return Result.Fail<UpdateUserCommandResult>(
+                    "Un usuarioempresa debe tener proveedor.", "user.supplierid.required");
+
+            if (command.BranchOfficeId is not null)
+                return Result.Fail<UpdateUserCommandResult>(
+                    "Un usuarioempresa no puede tener sucursal.", "user.branchofficeid.notallowed");
+        }
+        else if (role.Name is RoleNames.Admin or RoleNames.Conductor)
+        {
+            if (command.BranchOfficeId is null)
+                return Result.Fail<UpdateUserCommandResult>(
+                    $"Un {role.Name} debe tener sucursal.", "user.branchofficeid.required");
+
+            if (command.SupplierId is not null)
+                return Result.Fail<UpdateUserCommandResult>(
+                    $"Un {role.Name} no puede tener proveedor.", "user.supplierid.notallowed");
+        }
+
+        var actor = await userRepository.GetBySpecificationAsync(
+            new UserByIdSpecification(command.ActorUserId), cancellationToken);
+
+        if (actor is null)
+            return Result.Fail<UpdateUserCommandResult>(
+                "El usuario autenticado no existe.", "user.actor.notfound");
+
+        // El admin solo gestiona conductores de su propia sucursal, y no puede
+        // sacarlos de ella ni cambiarles el rol.
+        if (actor.Role.Name == RoleNames.Admin)
+        {
+            if (user.Role.Name != RoleNames.Conductor || user.BranchOfficeId != actor.BranchOfficeId)
+                return Result.Fail<UpdateUserCommandResult>(
+                    "Un admin solo puede editar conductores de su sucursal.", "user.access.forbidden");
+
+            if (role.Name != RoleNames.Conductor)
+                return Result.Fail<UpdateUserCommandResult>(
+                    "Un admin no puede cambiar el rol de un conductor.", "user.role.forbidden");
+
+            if (command.BranchOfficeId != actor.BranchOfficeId)
+                return Result.Fail<UpdateUserCommandResult>(
+                    "Un admin no puede mover conductores a otra sucursal.", "user.branchoffice.forbidden");
+        }
+
         Supplier? newSupplier = null;
 
         if (command.SupplierId is not null)

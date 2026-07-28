@@ -23,6 +23,8 @@ public static class AddCustomDbContextMethod
         }, ServiceLifetime.Scoped);
 
         services.AddScoped<RoleSeeder>();
+        services.AddScoped<BranchOfficeSeeder>();
+        services.AddScoped<SupplierSeeder>();
         services.AddScoped<UserSeeder>();
         services.AddScoped<ICoreUnitOfWork, EfUnitOfWork>();
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));

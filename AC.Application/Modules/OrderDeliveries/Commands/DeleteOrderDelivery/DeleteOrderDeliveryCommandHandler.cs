@@ -1,8 +1,11 @@
 using AC.Application.Abstractions.Messaging.Commands;
 using AC.Application.Modules.Articles.Specifications;
 using AC.Application.Modules.OrderDeliveries.Specifications;
+using AC.Application.Modules.Users.Specifications;
 using AC.Domain.Modules.Articles;
 using AC.Domain.Modules.OrderDeliveries;
+using AC.Domain.Modules.Roles;
+using AC.Domain.Modules.Users;
 using AC.Domain.Persistence;
 using AC.Domain.Results;
 
@@ -12,6 +15,7 @@ public class DeleteOrderDeliveryCommandHandler(
     IRepository<OrderDelivery> orderDeliveryRepository,
     IRepository<OrderDeliveryDetail> orderDeliveryDetailRepository,
     IRepository<Article> articleRepository,
+    IRepository<User> userRepository,
     ICoreUnitOfWork unitOfWork)
     : ICommandHandler<DeleteOrderDeliveryCommand, DeleteOrderDeliveryCommandResult>
 {
@@ -24,6 +28,17 @@ public class DeleteOrderDeliveryCommandHandler(
         if (order is null)
             return Result.Fail<DeleteOrderDeliveryCommandResult>(
                 "Orden no encontrada.", "orderdelivery.notfound");
+
+        var actor = await userRepository.GetBySpecificationAsync(
+            new UserByIdSpecification(command.UserId), cancellationToken);
+
+        if (actor is null)
+            return Result.Fail<DeleteOrderDeliveryCommandResult>(
+                "El usuario autenticado no existe.", "orderdelivery.user.notfound");
+
+        if (actor.Role.Name == RoleNames.UsuarioEmpresa && order.SupplierId != actor.SupplierId)
+            return Result.Fail<DeleteOrderDeliveryCommandResult>(
+                "La orden no pertenece al proveedor del usuario.", "orderdelivery.access.forbidden");
 
         if (order.Shipments.Any(s => s.Active))
             return Result.Fail<DeleteOrderDeliveryCommandResult>(

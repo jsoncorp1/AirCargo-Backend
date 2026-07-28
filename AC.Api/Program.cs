@@ -7,6 +7,7 @@ using AC.Infrastructure.Persistence.EntityFramework;
 using AC.Infrastructure.Persistence.EntityFramework.Seeders;
 using AC.Infrastructure.Services.Security;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -84,11 +85,15 @@ builder.Services.AddApplication();
 //----------------------------------------------------------------
 var app = builder.Build();
 
-// insersion de los seeders---------------------------------------
+// migracion + insersion de los seeders---------------------------
 using (var scope = app.Services.CreateScope())
 {
     var sp = scope.ServiceProvider;
+    // Single-instance: si algún día hay varias instancias, mover la migración a un paso de deploy.
+    await sp.GetRequiredService<CoreDbContext>().Database.MigrateAsync();
     await sp.GetRequiredService<RoleSeeder>().SeedAsync();
+    await sp.GetRequiredService<BranchOfficeSeeder>().SeedAsync();
+    await sp.GetRequiredService<SupplierSeeder>().SeedAsync();
     await sp.GetRequiredService<UserSeeder>().SeedAsync();
 }
 //-----------------------------------------------------------------

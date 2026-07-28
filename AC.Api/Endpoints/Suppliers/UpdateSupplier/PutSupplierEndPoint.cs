@@ -2,12 +2,15 @@ using System.Net;
 using AC.Application.Abstractions.Messaging;
 using AC.Application.Modules.Suppliers.Commands.UpdateSupplier;
 using AC.Domain.Modules.OrderDeliveries;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Suppliers.UpdateSupplier;
 
+[Authorize(Roles = RoleNames.SuperAdmin)]
 public class PutSupplierEndPoint(IMediator mediator)
     : EndpointBaseAsync
         .WithRequest<PutSupplierRequest>

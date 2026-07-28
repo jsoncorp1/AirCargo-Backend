@@ -1,5 +1,6 @@
 ﻿using AC.Application.Abstractions.Messaging.Queries;
 using AC.Application.Modules.Users.Specifications;
+using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Users;
 using AC.Domain.Persistence;
 using AC.Domain.Results;
@@ -15,7 +16,33 @@ public class GetUsersPaginatedQueryHandler(IRepository<User> repository)
         int page = query.Page < 1 ? 1 : query.Page;
         int perPage = query.PerPage is < 1 or > 100 ? 10 : query.PerPage;
 
-        var spec = new UserPaginationSpecification(page, perPage, query.RoleId, query.SupplierId);
+        var actor = await repository.GetBySpecificationAsync(
+            new UserByIdSpecification(query.UserId), cancellationToken);
+
+        if (actor is null)
+            return Result.Fail<GetUsersPaginatedQueryResult>(
+                "El usuario autenticado no existe.", "user.actor.notfound");
+
+        // El admin solo lista conductores de su sucursal; se ignoran los filtros del request.
+        var roleId = query.RoleId;
+        var supplierId = query.SupplierId;
+        string? roleName = null;
+        Guid? branchOfficeId = null;
+
+        if (actor.Role.Name == RoleNames.Admin)
+        {
+            if (actor.BranchOfficeId is null)
+                return Result.Fail<GetUsersPaginatedQueryResult>(
+                    "El usuario no tiene una sucursal asignada.", "user.actor.nobranch");
+
+            roleId = null;
+            supplierId = null;
+            roleName = RoleNames.Conductor;
+            branchOfficeId = actor.BranchOfficeId;
+        }
+
+        var spec = new UserPaginationSpecification(
+            page, perPage, roleId, supplierId, roleName, branchOfficeId);
         var result = await repository.GetPaginatedAsync(spec, cancellationToken);
 
         return Result.Success(new GetUsersPaginatedQueryResult

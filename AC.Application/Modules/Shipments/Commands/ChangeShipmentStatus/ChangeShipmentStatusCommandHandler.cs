@@ -1,6 +1,9 @@
 using AC.Application.Abstractions.Messaging.Commands;
 using AC.Application.Modules.Shipments.Specifications;
+using AC.Application.Modules.Users.Specifications;
+using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Shipments;
+using AC.Domain.Modules.Users;
 using AC.Domain.Persistence;
 using AC.Domain.Results;
 
@@ -8,6 +11,7 @@ namespace AC.Application.Modules.Shipments.Commands.ChangeShipmentStatus;
 
 public class ChangeShipmentStatusCommandHandler(
     IRepository<Shipment> shipmentRepository,
+    IRepository<User> userRepository,
     ICoreUnitOfWork unitOfWork)
     : ICommandHandler<ChangeShipmentStatusCommand, ChangeShipmentStatusCommandResult>
 {
@@ -20,6 +24,26 @@ public class ChangeShipmentStatusCommandHandler(
         if (shipment is null)
             return Result.Fail<ChangeShipmentStatusCommandResult>(
                 "Envío no encontrado.", "shipment.notfound");
+
+        // Admin y conductor solo cambian estados de envíos de su sucursal (origen o destino).
+        var actor = await userRepository.GetBySpecificationAsync(
+            new UserByIdSpecification(command.UserId), cancellationToken);
+
+        if (actor is null)
+            return Result.Fail<ChangeShipmentStatusCommandResult>(
+                "El usuario autenticado no existe.", "shipment.user.notfound");
+
+        if (actor.Role.Name is RoleNames.Admin or RoleNames.Conductor)
+        {
+            if (actor.BranchOfficeId is null)
+                return Result.Fail<ChangeShipmentStatusCommandResult>(
+                    "El usuario no tiene una sucursal asignada.", "shipment.user.nobranch");
+
+            if (shipment.OriginBranchOfficeId != actor.BranchOfficeId
+                && shipment.DestinationBranchOfficeId != actor.BranchOfficeId)
+                return Result.Fail<ChangeShipmentStatusCommandResult>(
+                    "El envío no pertenece a la sucursal del usuario.", "shipment.statuschange.forbidden");
+        }
 
         if (command.Status is null && command.Observation is null && command.DeliveryComment is null)
             return Result.Fail<ChangeShipmentStatusCommandResult>(

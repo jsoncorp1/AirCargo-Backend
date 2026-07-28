@@ -6,6 +6,9 @@ namespace AC.Application.Modules.OrderDeliveries.Commands.UpdateOrderDelivery;
 public class UpdateOrderDeliveryCommand : ICommand<UpdateOrderDeliveryCommandResult>
 {
     public Guid Id { get; set; }
+
+    // Usuario autenticado que edita; usuarioempresa solo puede editar órdenes de su proveedor.
+    public Guid UserId { get; set; }
     public BolivianDepartment DestinationDepartment { get; set; }
     public string ClientPhone { get; set; } = string.Empty;
     public string ClientFullName { get; set; } = string.Empty;

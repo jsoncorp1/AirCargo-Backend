@@ -1,6 +1,9 @@
 using AC.Application.Abstractions.Messaging.Commands;
 using AC.Application.Modules.Shipments.Specifications;
+using AC.Application.Modules.Users.Specifications;
+using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Shipments;
+using AC.Domain.Modules.Users;
 using AC.Domain.Persistence;
 using AC.Domain.Results;
 
@@ -9,6 +12,7 @@ namespace AC.Application.Modules.Shipments.Commands.UpdateShipment;
 public class UpdateShipmentCommandHandler(
     IRepository<Shipment> shipmentRepository,
     IRepository<ShipmentDetail> shipmentDetailRepository,
+    IRepository<User> userRepository,
     ICoreUnitOfWork unitOfWork)
     : ICommandHandler<UpdateShipmentCommand, UpdateShipmentCommandResult>
 {
@@ -21,6 +25,19 @@ public class UpdateShipmentCommandHandler(
         if (shipment is null)
             return Result.Fail<UpdateShipmentCommandResult>(
                 "Envío no encontrado.", "shipment.notfound");
+
+        var actor = await userRepository.GetBySpecificationAsync(
+            new UserByIdSpecification(command.UserId), cancellationToken);
+
+        if (actor is null)
+            return Result.Fail<UpdateShipmentCommandResult>(
+                "El usuario autenticado no existe.", "shipment.user.notfound");
+
+        if (actor.Role.Name == RoleNames.Admin
+            && shipment.OriginBranchOfficeId != actor.BranchOfficeId
+            && shipment.DestinationBranchOfficeId != actor.BranchOfficeId)
+            return Result.Fail<UpdateShipmentCommandResult>(
+                "El envío no pertenece a la sucursal del usuario.", "shipment.access.forbidden");
 
         if (command.Lines.Count == 0)
             return Result.Fail<UpdateShipmentCommandResult>(

@@ -1,14 +1,18 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
+using AC.Application.Abstractions.Security;
 using AC.Application.Modules.Shipments.Queries.GetShipmentsPaginated;
 using AC.Domain.Modules.Shipments;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Shipments.GetShipment;
 
-public class GetShipmentsPaginatedEndPoint(IMediator mediator)
+[Authorize(Roles = RoleNames.Todos)]
+public class GetShipmentsPaginatedEndPoint(IMediator mediator, ICurrentUser currentUser)
     : EndpointBaseAsync
         .WithRequest<GetShipmentsPaginatedRequest>
         .WithActionResult<GetShipmentsPaginatedQueryResult>
@@ -16,6 +20,7 @@ public class GetShipmentsPaginatedEndPoint(IMediator mediator)
     [HttpGet("api/v1/core/shipments")]
     [SwaggerOperation(Tags = ["Core / Shipments"])]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(GetShipmentsPaginatedQueryResult))]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ProblemDetails))]
     public override async Task<ActionResult<GetShipmentsPaginatedQueryResult>> HandleAsync(
         [FromQuery] GetShipmentsPaginatedRequest request,
         CancellationToken cancellationToken = default)
@@ -25,6 +30,7 @@ public class GetShipmentsPaginatedEndPoint(IMediator mediator)
             {
                 Page = request.Page,
                 PerPage = request.PerPage,
+                UserId = currentUser.UserId!.Value,
                 SupplierId = request.SupplierId,
                 OriginBranchOfficeId = request.OriginBranchOfficeId,
                 DestinationBranchOfficeId = request.DestinationBranchOfficeId,
@@ -32,7 +38,7 @@ public class GetShipmentsPaginatedEndPoint(IMediator mediator)
             },
             cancellationToken);
 
-        return Ok(result.Value);
+        return result.Failure ? this.ToProblem(result) : Ok(result.Value);
     }
 }
 

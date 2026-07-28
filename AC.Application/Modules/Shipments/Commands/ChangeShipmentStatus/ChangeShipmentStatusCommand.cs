@@ -9,6 +9,10 @@ namespace AC.Application.Modules.Shipments.Commands.ChangeShipmentStatus;
 public class ChangeShipmentStatusCommand : ICommand<ChangeShipmentStatusCommandResult>
 {
     public Guid Id { get; set; }
+
+    // Usuario autenticado; admin/conductor solo pueden tocar envíos de su sucursal.
+    public Guid UserId { get; set; }
+
     public ShipmentStatus? Status { get; set; }
     public ShipmentObservation? Observation { get; set; }
     public string? DeliveryComment { get; set; }

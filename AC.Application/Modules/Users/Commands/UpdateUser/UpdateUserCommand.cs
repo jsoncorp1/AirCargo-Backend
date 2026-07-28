@@ -5,6 +5,9 @@ namespace AC.Application.Modules.Users.Commands.UpdateUser;
 public class UpdateUserCommand : ICommand<UpdateUserCommandResult>
 {
     public Guid Id { get; set; }
+
+    // Usuario autenticado que edita; admin solo puede editar conductores de su sucursal.
+    public Guid ActorUserId { get; set; }
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;

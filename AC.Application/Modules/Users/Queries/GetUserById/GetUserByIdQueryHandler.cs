@@ -1,5 +1,6 @@
 ﻿using AC.Application.Abstractions.Messaging.Queries;
 using AC.Application.Modules.Users.Specifications;
+using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Users;
 using AC.Domain.Persistence;
 using AC.Domain.Results;
@@ -19,6 +20,19 @@ public class GetUserByIdQueryHandler(
         if (user is null)
             return Result.Fail<GetUserByIdQueryResult>(
                 "El usuario no existe.", "user.notfound");
+
+        var actor = await repository.GetBySpecificationAsync(
+            new UserByIdSpecification(query.UserId), cancellationToken);
+
+        if (actor is null)
+            return Result.Fail<GetUserByIdQueryResult>(
+                "El usuario autenticado no existe.", "user.actor.notfound");
+
+        // El admin solo ve conductores de su sucursal.
+        if (actor.Role.Name == RoleNames.Admin
+            && (user.Role.Name != RoleNames.Conductor || user.BranchOfficeId != actor.BranchOfficeId))
+            return Result.Fail<GetUserByIdQueryResult>(
+                "Un admin solo puede ver conductores de su sucursal.", "user.access.forbidden");
 
         return Result.Success(new GetUserByIdQueryResult
         {

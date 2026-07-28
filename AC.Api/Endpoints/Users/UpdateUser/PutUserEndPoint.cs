@@ -1,13 +1,17 @@
 using System.Net;
 using AC.Application.Abstractions.Messaging;
+using AC.Application.Abstractions.Security;
 using AC.Application.Modules.Users.Commands.UpdateUser;
+using AC.Domain.Modules.Roles;
 using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AC.Api.Endpoints.Users.UpdateUser;
 
-public class PutUserEndPoint(IMediator mediator)
+[Authorize(Roles = RoleNames.SuperAdminAdmin)]
+public class PutUserEndPoint(IMediator mediator, ICurrentUser currentUser)
     : EndpointBaseAsync
         .WithRequest<PutUserRequest>
         .WithActionResult<UpdateUserCommandResult>
@@ -17,12 +21,14 @@ public class PutUserEndPoint(IMediator mediator)
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(UpdateUserCommandResult))]
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(ProblemDetails))]
+    [ProducesResponseType((int)HttpStatusCode.Forbidden, Type = typeof(ProblemDetails))]
     public override async Task<ActionResult<UpdateUserCommandResult>> HandleAsync(
         PutUserRequest request, CancellationToken cancellationToken = default)
     {
         var command = new UpdateUserCommand
         {
             Id = request.Id,
+            ActorUserId = currentUser.UserId!.Value,
             FullName = request.Body.FullName,
             Email = request.Body.Email,
             PhoneNumber = request.Body.PhoneNumber ?? string.Empty,
@@ -35,13 +41,7 @@ public class PutUserEndPoint(IMediator mediator)
         var result = await mediator.SendCommandAsync<UpdateUserCommand, UpdateUserCommandResult>(
             command, cancellationToken);
 
-        if (result.Failure)
-        {
-            var problem = new ProblemDetails { Title = result.ErrorKey, Detail = result.Error };
-            return result.ErrorKey == "user.notfound" ? NotFound(problem) : BadRequest(problem);
-        }
-
-        return Ok(result.Value);
+        return result.Failure ? this.ToProblem(result) : Ok(result.Value);
     }
 }
 

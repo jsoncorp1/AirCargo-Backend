@@ -5,4 +5,7 @@ namespace AC.Application.Modules.ArticleReceipts.Queries.GetArticleReceiptById;
 public class GetArticleReceiptByIdQuery : IQuery<GetArticleReceiptByIdQueryResult>
 {
     public Guid Id { get; set; }
+
+    // Usuario autenticado que consulta; define el alcance según su rol.
+    public Guid UserId { get; set; }
 }

@@ -97,6 +97,43 @@ public class CreateUserCommandHandler(
         if (role is null)
             return Result.Fail("El rol indicado no existe.", "user.role.notfound");
 
+        // Coherencia rol ↔ alcance: usuarioempresa pertenece a un proveedor,
+        // admin/conductor pertenecen a una sucursal.
+        if (role.Name == RoleNames.UsuarioEmpresa)
+        {
+            if (command.SupplierId is null)
+                return Result.Fail("Un usuarioempresa debe tener proveedor.", "user.supplierid.required");
+
+            if (command.BranchOfficeId is not null)
+                return Result.Fail("Un usuarioempresa no puede tener sucursal.", "user.branchofficeid.notallowed");
+        }
+        else if (role.Name is RoleNames.Admin or RoleNames.Conductor)
+        {
+            if (command.BranchOfficeId is null)
+                return Result.Fail($"Un {role.Name} debe tener sucursal.", "user.branchofficeid.required");
+
+            if (command.SupplierId is not null)
+                return Result.Fail($"Un {role.Name} no puede tener proveedor.", "user.supplierid.notallowed");
+        }
+
+        var actor = await userRepository.GetBySpecificationAsync(
+            new UserByIdSpecification(command.ActorUserId), cancellationToken);
+
+        if (actor is null)
+            return Result.Fail("El usuario autenticado no existe.", "user.actor.notfound");
+
+        // El admin solo gestiona conductores de su propia sucursal.
+        if (actor.Role.Name == RoleNames.Admin)
+        {
+            if (role.Name != RoleNames.Conductor)
+                return Result.Fail(
+                    "Un admin solo puede crear usuarios con rol conductor.", "user.role.forbidden");
+
+            if (command.BranchOfficeId != actor.BranchOfficeId)
+                return Result.Fail(
+                    "Un admin solo puede crear conductores de su sucursal.", "user.branchoffice.forbidden");
+        }
+
         if (command.SupplierId is not null)
         {
             var supplier = await supplierRepository.GetBySpecificationAsync(

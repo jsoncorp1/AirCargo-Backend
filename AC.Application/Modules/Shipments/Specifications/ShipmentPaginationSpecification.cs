@@ -12,7 +12,8 @@ public class ShipmentPaginationSpecification : PaginationSpecification<Shipment>
         Guid? supplierId = null,
         Guid? originBranchOfficeId = null,
         Guid? destinationBranchOfficeId = null,
-        ShipmentStatus? status = null)
+        ShipmentStatus? status = null,
+        Guid? anyBranchOfficeId = null)
         : base(page, perPage)
     {
         Query
@@ -32,5 +33,10 @@ public class ShipmentPaginationSpecification : PaginationSpecification<Shipment>
 
         if (status is not null)
             Query.Where(s => s.Status == status);
+
+        // Alcance por sucursal (admin/conductor): la sucursal como origen o destino.
+        if (anyBranchOfficeId is not null)
+            Query.Where(s => s.OriginBranchOfficeId == anyBranchOfficeId
+                          || s.DestinationBranchOfficeId == anyBranchOfficeId);
     }
 }

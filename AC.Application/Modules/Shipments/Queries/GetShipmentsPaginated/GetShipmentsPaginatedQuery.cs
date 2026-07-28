@@ -8,6 +8,9 @@ public class GetShipmentsPaginatedQuery : IQuery<GetShipmentsPaginatedQueryResul
     public int Page { get; set; } = 1;
     public int PerPage { get; set; } = 10;
 
+    // Usuario autenticado que consulta; define el alcance según su rol.
+    public Guid UserId { get; set; }
+
     // Filtros opcionales y combinables; sin filtros se lista todo en general.
     public Guid? SupplierId { get; set; }
     public Guid? OriginBranchOfficeId { get; set; }

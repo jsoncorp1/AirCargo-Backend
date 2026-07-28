@@ -1,12 +1,17 @@
 using AC.Application.Abstractions.Messaging.Queries;
 using AC.Application.Modules.Shipments.Specifications;
+using AC.Application.Modules.Users.Specifications;
+using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Shipments;
+using AC.Domain.Modules.Users;
 using AC.Domain.Persistence;
 using AC.Domain.Results;
 
 namespace AC.Application.Modules.Shipments.Queries.GetShipmentsPaginated;
 
-public class GetShipmentsPaginatedQueryHandler(IRepository<Shipment> repository)
+public class GetShipmentsPaginatedQueryHandler(
+    IRepository<Shipment> repository,
+    IRepository<User> userRepository)
     : IQueryHandler<GetShipmentsPaginatedQuery, GetShipmentsPaginatedQueryResult>
 {
     public async Task<Result<GetShipmentsPaginatedQueryResult>> HandleAsync(
@@ -15,12 +20,41 @@ public class GetShipmentsPaginatedQueryHandler(IRepository<Shipment> repository)
         int page = query.Page < 1 ? 1 : query.Page;
         int perPage = query.PerPage is < 1 or > 100 ? 10 : query.PerPage;
 
+        var actor = await userRepository.GetBySpecificationAsync(
+            new UserByIdSpecification(query.UserId), cancellationToken);
+
+        if (actor is null)
+            return Result.Fail<GetShipmentsPaginatedQueryResult>(
+                "El usuario autenticado no existe.", "shipment.user.notfound");
+
+        // El alcance se decide con datos de BD, nunca con filtros libres del cliente.
+        var supplierId = query.SupplierId;
+        Guid? anyBranchOfficeId = null;
+
+        if (actor.Role.Name == RoleNames.UsuarioEmpresa)
+        {
+            if (actor.SupplierId is null)
+                return Result.Fail<GetShipmentsPaginatedQueryResult>(
+                    "El usuario no pertenece a ningún proveedor.", "shipment.user.notsupplier");
+
+            supplierId = actor.SupplierId;
+        }
+        else if (actor.Role.Name is RoleNames.Admin or RoleNames.Conductor)
+        {
+            if (actor.BranchOfficeId is null)
+                return Result.Fail<GetShipmentsPaginatedQueryResult>(
+                    "El usuario no tiene una sucursal asignada.", "shipment.user.nobranch");
+
+            anyBranchOfficeId = actor.BranchOfficeId;
+        }
+
         var spec = new ShipmentPaginationSpecification(
             page, perPage,
-            query.SupplierId,
+            supplierId,
             query.OriginBranchOfficeId,
             query.DestinationBranchOfficeId,
-            query.Status);
+            query.Status,
+            anyBranchOfficeId);
         var result = await repository.GetPaginatedAsync(spec, cancellationToken);
 
         return Result.Success(new GetShipmentsPaginatedQueryResult
