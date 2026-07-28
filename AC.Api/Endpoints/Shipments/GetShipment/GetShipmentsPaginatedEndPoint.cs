@@ -34,7 +34,9 @@ public class GetShipmentsPaginatedEndPoint(IMediator mediator, ICurrentUser curr
                 SupplierId = request.SupplierId,
                 OriginBranchOfficeId = request.OriginBranchOfficeId,
                 DestinationBranchOfficeId = request.DestinationBranchOfficeId,
-                Status = request.Status
+                Status = request.Status,
+                DateFrom = request.DateFrom,
+                DateTo = request.DateTo
             },
             cancellationToken);
 
@@ -50,4 +52,8 @@ public class GetShipmentsPaginatedRequest
     public Guid? OriginBranchOfficeId { get; set; }
     public Guid? DestinationBranchOfficeId { get; set; }
     public ShipmentStatus? Status { get; set; }
+
+    // Rango por fecha de creación del envío; ambas inclusive.
+    public DateTime? DateFrom { get; set; }
+    public DateTime? DateTo { get; set; }
 }

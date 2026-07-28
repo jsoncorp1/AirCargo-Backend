@@ -13,7 +13,9 @@ public class ShipmentPaginationSpecification : PaginationSpecification<Shipment>
         Guid? originBranchOfficeId = null,
         Guid? destinationBranchOfficeId = null,
         ShipmentStatus? status = null,
-        Guid? anyBranchOfficeId = null)
+        Guid? anyBranchOfficeId = null,
+        DateTime? dateFrom = null,
+        DateTime? dateTo = null)
         : base(page, perPage)
     {
         Query
@@ -38,5 +40,12 @@ public class ShipmentPaginationSpecification : PaginationSpecification<Shipment>
         if (anyBranchOfficeId is not null)
             Query.Where(s => s.OriginBranchOfficeId == anyBranchOfficeId
                           || s.DestinationBranchOfficeId == anyBranchOfficeId);
+
+        // Rango por fecha de creación del envío; el handler ya normalizó a UTC.
+        if (dateFrom is not null)
+            Query.Where(s => s.CreatedAt >= dateFrom);
+
+        if (dateTo is not null)
+            Query.Where(s => s.CreatedAt <= dateTo);
     }
 }

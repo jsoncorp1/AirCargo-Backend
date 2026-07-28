@@ -16,4 +16,9 @@ public class GetShipmentsPaginatedQuery : IQuery<GetShipmentsPaginatedQueryResul
     public Guid? OriginBranchOfficeId { get; set; }
     public Guid? DestinationBranchOfficeId { get; set; }
     public ShipmentStatus? Status { get; set; }
+
+    // Rango por fecha de creación; ambas inclusive. Si vienen sin hora, el
+    // handler toma el día completo.
+    public DateTime? DateFrom { get; set; }
+    public DateTime? DateTo { get; set; }
 }

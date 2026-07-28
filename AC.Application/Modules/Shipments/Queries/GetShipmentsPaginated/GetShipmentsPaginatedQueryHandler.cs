@@ -48,13 +48,26 @@ public class GetShipmentsPaginatedQueryHandler(
             anyBranchOfficeId = actor.BranchOfficeId;
         }
 
+        var dateFrom = ToUtc(query.DateFrom);
+        var dateTo = ToUtc(query.DateTo);
+
+        // "hasta el día X" incluye todo ese día.
+        if (dateTo is not null && dateTo.Value.TimeOfDay == TimeSpan.Zero)
+            dateTo = dateTo.Value.AddDays(1).AddTicks(-1);
+
+        if (dateFrom is not null && dateTo is not null && dateFrom > dateTo)
+            return Result.Fail<GetShipmentsPaginatedQueryResult>(
+                "La fecha desde no puede ser mayor que la fecha hasta.", "shipment.daterange.invalid");
+
         var spec = new ShipmentPaginationSpecification(
             page, perPage,
             supplierId,
             query.OriginBranchOfficeId,
             query.DestinationBranchOfficeId,
             query.Status,
-            anyBranchOfficeId);
+            anyBranchOfficeId,
+            dateFrom,
+            dateTo);
         var result = await repository.GetPaginatedAsync(spec, cancellationToken);
 
         return Result.Success(new GetShipmentsPaginatedQueryResult
@@ -84,4 +97,14 @@ public class GetShipmentsPaginatedQueryHandler(
             })
         });
     }
+
+    // created_at es timestamptz: Postgres solo acepta DateTime en UTC. Una fecha
+    // sin zona horaria se interpreta como UTC.
+    private static DateTime? ToUtc(DateTime? value) => value?.Kind switch
+    {
+        null => null,
+        DateTimeKind.Utc => value,
+        DateTimeKind.Local => value.Value.ToUniversalTime(),
+        _ => DateTime.SpecifyKind(value.Value, DateTimeKind.Utc)
+    };
 }
