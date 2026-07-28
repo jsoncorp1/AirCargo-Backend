@@ -88,10 +88,12 @@ public class CreateOrderDeliveryCommandHandler(
             SupplierId = supplierId,
             UserId = command.UserId,
             OrderType = OrderType.Corporate,
-            // Snapshot del proveedor como emisor: si el proveedor cambia de
-            // departamento o de nombre después, esta orden ya creada no debe verse afectada.
-            OriginDepartment = user.Supplier!.Department,
-            SenderFullName = user.Supplier.Name,
+            // Snapshot del emisor. El departamento de origen sale de la sucursal
+            // del usuario que crea la orden; si no tiene (usuarioempresa), del
+            // departamento de su proveedor. Es el dato con el que los admins de
+            // ese departamento ven la orden para atenderla.
+            OriginDepartment = user.BranchOffice?.BolivianDepartment ?? user.Supplier!.Department,
+            SenderFullName = user.Supplier!.Name,
             DestinationDepartment = command.DestinationDepartment,
             ClientPhone = command.ClientPhone,
             ClientFullName = command.ClientFullName,

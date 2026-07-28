@@ -45,7 +45,7 @@ public class PostOrderDeliveryEndPoint(IMediator mediator, ICurrentUser currentU
             command, cancellationToken);
 
         return result.Failure
-            ? BadRequest(new ProblemDetails { Title = result.ErrorKey, Detail = result.Error })
+            ? this.ToProblem(result)
             : Created($"api/v1/core/order-deliveries/{result.Value.Id}", result.Value);
     }
 }

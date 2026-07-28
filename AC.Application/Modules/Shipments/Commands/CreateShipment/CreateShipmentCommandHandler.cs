@@ -4,6 +4,7 @@ using AC.Application.Modules.OrderDeliveries.Specifications;
 using AC.Application.Modules.Users.Specifications;
 using AC.Domain.Modules.BranchOffices;
 using AC.Domain.Modules.OrderDeliveries;
+using AC.Domain.Modules.Roles;
 using AC.Domain.Modules.Shipments;
 using AC.Domain.Modules.Users;
 using AC.Domain.Persistence;
@@ -57,6 +58,14 @@ public class CreateShipmentCommandHandler(
         if (attendingUser.BranchOfficeId is null)
             return Result.Fail<CreateShipmentCommandResult>(
                 "El usuario que atiende no tiene una sucursal asignada.", "shipment.originbranch.missing");
+
+        // Solo se atienden órdenes que nacieron en el departamento de la sucursal
+        // que atiende; el superadmin no tiene esa restricción.
+        if (attendingUser.Role.Name == RoleNames.Admin
+            && order.OriginDepartment != attendingUser.BranchOffice!.BolivianDepartment)
+            return Result.Fail<CreateShipmentCommandResult>(
+                "La orden no nace en el departamento de la sucursal del usuario.",
+                "shipment.orderdelivery.forbidden");
 
         var destinationBranch = await branchOfficeRepository.GetBySpecificationAsync(
             new BranchOfficeByIdSpecification(command.DestinationBranchOfficeId), cancellationToken);

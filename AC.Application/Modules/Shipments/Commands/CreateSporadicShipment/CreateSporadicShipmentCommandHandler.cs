@@ -79,7 +79,8 @@ public class CreateSporadicShipmentCommandHandler(
             SupplierId = null,
             UserId = command.UserId,
             OrderType = OrderType.Sporadic,
-            OriginDepartment = command.OriginDepartment,
+            // El departamento de origen sale de la sucursal del usuario que registra.
+            OriginDepartment = user.BranchOffice!.BolivianDepartment,
             SenderFullName = command.SenderFullName,
             SenderPhone = command.SenderPhone,
             SenderAddress = command.SenderAddress,

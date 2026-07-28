@@ -42,13 +42,9 @@ public class PostShipmentEndPoint(IMediator mediator, ICurrentUser currentUser)
         var result = await mediator.SendCommandAsync<CreateShipmentCommand, CreateShipmentCommandResult>(
             command, cancellationToken);
 
-        if (result.Failure)
-        {
-            var problem = new ProblemDetails { Title = result.ErrorKey, Detail = result.Error };
-            return result.ErrorKey == "shipment.orderdelivery.notfound" ? NotFound(problem) : BadRequest(problem);
-        }
-
-        return Created($"api/v1/core/shipments/{result.Value.Id}", result.Value);
+        return result.Failure
+            ? this.ToProblem(result)
+            : Created($"api/v1/core/shipments/{result.Value.Id}", result.Value);
     }
 }
 

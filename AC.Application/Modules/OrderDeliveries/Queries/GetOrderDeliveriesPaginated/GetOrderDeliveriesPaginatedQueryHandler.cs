@@ -29,6 +29,8 @@ public class GetOrderDeliveriesPaginatedQueryHandler(
 
         // usuarioempresa solo ve órdenes de su proveedor; se ignora el filtro del request.
         var supplierId = query.SupplierId;
+        BolivianDepartment? originDepartment = null;
+
         if (actor.Role.Name == RoleNames.UsuarioEmpresa)
         {
             if (actor.SupplierId is null)
@@ -37,8 +39,19 @@ public class GetOrderDeliveriesPaginatedQueryHandler(
 
             supplierId = actor.SupplierId;
         }
+        else if (actor.Role.Name == RoleNames.Admin)
+        {
+            // El admin solo ve las órdenes que nacen en el departamento de su sucursal:
+            // son las que le toca atender.
+            if (actor.BranchOffice is null)
+                return Result.Fail<GetOrderDeliveriesPaginatedQueryResult>(
+                    "El usuario no tiene una sucursal asignada.", "orderdelivery.user.nobranch");
 
-        var spec = new OrderDeliveryPaginationSpecification(page, perPage, supplierId, query.Unattended);
+            originDepartment = actor.BranchOffice.BolivianDepartment;
+        }
+
+        var spec = new OrderDeliveryPaginationSpecification(
+            page, perPage, supplierId, query.Unattended, originDepartment);
         var result = await repository.GetPaginatedAsync(spec, cancellationToken);
 
         return Result.Success(new GetOrderDeliveriesPaginatedQueryResult

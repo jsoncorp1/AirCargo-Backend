@@ -35,6 +35,12 @@ public class GetOrderDeliveryByIdQueryHandler(
             return Result.Fail<GetOrderDeliveryByIdQueryResult>(
                 "La orden no pertenece al proveedor del usuario.", "orderdelivery.access.forbidden");
 
+        if (actor.Role.Name == RoleNames.Admin
+            && order.OriginDepartment != actor.BranchOffice?.BolivianDepartment)
+            return Result.Fail<GetOrderDeliveryByIdQueryResult>(
+                "La orden no nace en el departamento de la sucursal del usuario.",
+                "orderdelivery.access.forbidden");
+
         return Result.Success(new GetOrderDeliveryByIdQueryResult
         {
             Id = order.Id,

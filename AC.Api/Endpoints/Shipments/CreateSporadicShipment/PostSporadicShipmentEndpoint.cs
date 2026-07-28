@@ -28,7 +28,6 @@ public class PostSporadicShipmentEndPoint(IMediator mediator, ICurrentUser curre
         {
             UserId = currentUser.UserId!.Value,
             DestinationBranchOfficeId = request.DestinationBranchOfficeId,
-            OriginDepartment = request.OriginDepartment,
             SenderFullName = request.SenderFullName,
             SenderPhone = request.SenderPhone,
             SenderAddress = request.SenderAddress,
@@ -54,17 +53,17 @@ public class PostSporadicShipmentEndPoint(IMediator mediator, ICurrentUser curre
             command, cancellationToken);
 
         return result.Failure
-            ? BadRequest(new ProblemDetails { Title = result.ErrorKey, Detail = result.Error })
+            ? this.ToProblem(result)
             : Created($"api/v1/core/shipments/{result.Value.ShipmentId}", result.Value);
     }
 }
 
 public class CreateSporadicShipmentRequest
 {
-    // El origen no se manda: se toma de la sucursal del usuario autenticado.
+    // El origen no se manda (ni sucursal ni departamento): se toma de la
+    // sucursal del usuario autenticado.
     public Guid DestinationBranchOfficeId { get; set; }
 
-    public BolivianDepartment OriginDepartment { get; set; }
     public string SenderFullName { get; set; } = null!;
     public string SenderPhone { get; set; } = null!;
     public string SenderAddress { get; set; } = null!;

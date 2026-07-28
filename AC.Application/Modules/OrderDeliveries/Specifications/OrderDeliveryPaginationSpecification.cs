@@ -7,7 +7,8 @@ namespace AC.Application.Modules.OrderDeliveries.Specifications;
 public class OrderDeliveryPaginationSpecification : PaginationSpecification<OrderDelivery>
 {
     public OrderDeliveryPaginationSpecification(
-        int page, int perPage, Guid? supplierId = null, bool? unattended = null)
+        int page, int perPage, Guid? supplierId = null, bool? unattended = null,
+        BolivianDepartment? originDepartment = null)
         : base(page, perPage)
     {
         Query
@@ -20,5 +21,9 @@ public class OrderDeliveryPaginationSpecification : PaginationSpecification<Orde
 
         if (unattended is true)
             Query.Where(o => !o.Shipments.Any(s => s.Active));
+
+        // Alcance del admin: las órdenes que nacen en el departamento de su sucursal.
+        if (originDepartment is not null)
+            Query.Where(o => o.OriginDepartment == originDepartment);
     }
 }
